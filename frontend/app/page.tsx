@@ -34,16 +34,16 @@ export default function LandingPage() {
       {/* 3D Background Geometric Mesh fixed behind everything */}
       <Hero3D />
 
-      {/* Massive Scroll Narrative Container (800vh) */}
-      <div ref={containerRef} className="relative w-full h-[800vh] pointer-events-none">
+      {/* Massive Scroll Narrative Container (2000vh) */}
+      <div ref={containerRef} className="relative w-full h-[2000vh] pointer-events-none">
 
-        {/* SECTION 1: HERO (0 - 0.15) */}
+        {/* SECTION 1: HERO (0 - 0.05) */}
         <motion.div
           className="fixed top-0 left-0 w-full h-screen flex flex-col justify-end px-6 lg:px-24 pb-[15vh]"
           style={{
-            opacity: useTransform(scrollYProgress, [0, 0.15], [1, 0]),
-            y: useTransform(scrollYProgress, [0, 0.15], [0, -100]),
-            pointerEvents: useTransform(scrollYProgress, (val) => val < 0.15 ? 'auto' : 'none') as any
+            opacity: useTransform(scrollYProgress, [0, 0.05], [1, 0]),
+            y: useTransform(scrollYProgress, [0, 0.05], [0, -100]),
+            pointerEvents: useTransform(scrollYProgress, (val) => val < 0.05 ? 'auto' : 'none') as any
           }}
         >
           <div className="flex items-center gap-4 mb-6 opacity-80 font-mono tracking-[0.2em] text-[10px] md:text-sm uppercase font-bold text-white">
@@ -70,47 +70,99 @@ export default function LandingPage() {
           </div>
         </motion.div>
 
-        {/* SECTION 2: WHAT IS ARXION (0.15 - 0.3) */}
+        {/* SECTION 2: WHAT IS ARXION - FLOATING SENTENCES (0.08 - 0.28) */}
+        <motion.div
+          className="fixed top-0 left-0 w-full h-screen flex flex-col justify-center items-center text-center px-6 pointer-events-none"
+        >
+          {/* Sentence 1 */}
+          <motion.div
+            className="absolute w-full px-6 flex flex-col items-center"
+            style={{
+              opacity: useTransform(scrollYProgress, [0.08, 0.12, 0.16], [0, 1, 0]),
+              y: useTransform(scrollYProgress, [0.08, 0.16], [100, -100]),
+            }}
+          >
+            <div className="font-mono text-[9px] text-[#C02B0A] tracking-[0.4em] uppercase mb-4 border border-[#C02B0A]/30 bg-black/50 px-3 py-1 backdrop-blur inline-block w-max">
+              CORE DEFINITION
+            </div>
+            <h3 className="text-3xl md:text-5xl font-cyber text-white uppercase tracking-widest max-w-3xl leading-snug">
+              Arxion is a Research Credibility & Intelligence Engine.
+            </h3>
+          </motion.div>
+
+          {/* Sentence 2 */}
+          <motion.div
+            className="absolute w-full px-6 flex flex-col items-center"
+            style={{
+              opacity: useTransform(scrollYProgress, [0.15, 0.19, 0.23], [0, 1, 0]),
+              y: useTransform(scrollYProgress, [0.15, 0.23], [100, -100]),
+            }}
+          >
+            <div className="font-mono text-[9px] text-[#C02B0A] tracking-[0.4em] uppercase mb-4 border border-[#C02B0A]/30 bg-black/50 px-3 py-1 backdrop-blur inline-block w-max">
+              THE PROBLEM
+            </div>
+            <h3 className="text-3xl md:text-5xl font-cyberlight font-bold text-white uppercase tracking-widest max-w-4xl leading-snug">
+              It structures papers, scores credibility, and detects contradictions across dataset boundaries.
+            </h3>
+          </motion.div>
+
+          {/* Sentence 3 */}
+          <motion.div
+            className="absolute w-full px-6 flex flex-col items-center"
+            style={{
+              opacity: useTransform(scrollYProgress, [0.22, 0.26, 0.30], [0, 1, 0]),
+              y: useTransform(scrollYProgress, [0.22, 0.30], [100, -100]),
+            }}
+          >
+            <div className="font-mono text-[9px] text-[#C02B0A] tracking-[0.4em] uppercase mb-4 border border-[#C02B0A]/30 bg-black/50 px-3 py-1 backdrop-blur inline-block w-max">
+              THE OBJECTIVE
+            </div>
+            <h3 className="text-3xl md:text-5xl font-cyber text-white uppercase tracking-widest max-w-3xl leading-snug">
+              Helping you decide exactly what to trust, and what to build next.
+            </h3>
+          </motion.div>
+        </motion.div>
+
+        {/* SECTION 3: CLASSY CAPABILITIES HEADING (0.32 - 0.42) */}
         <motion.div
           className={`fixed top-0 left-0 w-full h-screen flex flex-col justify-center px-6 lg:px-32 ${textColorClass} transition-colors duration-1000`}
           style={{
-            opacity: useTransform(scrollYProgress, [0.12, 0.22, 0.32], [0, 1, 0]),
-            x: useTransform(scrollYProgress, [0.12, 0.22, 0.32], [-200, 0, 200])
+            opacity: useTransform(scrollYProgress, [0.32, 0.37, 0.45], [0, 1, 0]),
+            x: useTransform(scrollYProgress, [0.32, 0.37, 0.45], [-200, 0, 200])
           }}
         >
           <div className="flex items-center gap-4 mb-6 font-mono tracking-[0.2em] text-sm uppercase font-bold">
-            <span className="bg-white text-[#3C091E] px-3 py-1 border border-[#3C091E]/20">UNDERSTANDING</span>
+            <span className="bg-[#C02B0A] text-white px-3 py-1 border border-[#C02B0A]/20 tracking-widest text-[10px]">SYSTEM INFRASTRUCTURE</span>
             <div className={`w-12 h-0.5 bg-current opacity-30`} />
           </div>
 
-          <h2 className="text-8xl md:text-[9vw] font-display font-black tracking-tighter leading-none uppercase" style={{ wordSpacing: '-10px' }}>
-            WHAT IS<br />
-            <span className="flex items-center">
-              <span className="w-16 h-2 bg-current mr-6 opacity-30" />
-              ARXION?
+          <h2 className="text-6xl md:text-[8vw] font-display font-black tracking-tighter leading-none uppercase text-white" style={{ wordSpacing: '-5px' }}>
+            AUTONOMOUS<br />
+            <span className="flex items-center text-[#97494E]">
+              <span className="w-16 h-1 bg-[#3C091E] mr-6" />
+              CAPABILITIES
             </span>
           </h2>
         </motion.div>
 
 
-        {/* SECTION 4: THE WHITE CARDS GAP FINDER (0.5 - 0.75) */}
-        {/* At progress > 0.4, the 3D scene is white, perfectly setting the stage for these cards */}
+        {/* SECTION 4: THE GRAPH INTERACTION LAYER (0.45 - 0.90) */}
+        {/* At progress > 0.45, the 3D graph elements become interactable as the camera flies through them */}
         <motion.div
           className="fixed top-0 left-0 w-full h-screen flex flex-col justify-center pointer-events-auto"
           style={{
-            opacity: useTransform(scrollYProgress, [0.45, 0.55, 0.8], [0, 1, 0]),
-            y: useTransform(scrollYProgress, [0.45, 0.55, 0.8], [150, 0, -150]),
-            pointerEvents: useTransform(scrollYProgress, (val) => val > 0.45 && val < 0.8 ? 'auto' : 'none') as any
+            opacity: useTransform(scrollYProgress, [0.45, 0.50, 0.90], [0, 1, 0]),
+            pointerEvents: useTransform(scrollYProgress, (val) => val > 0.45 && val < 0.90 ? 'auto' : 'none') as any
           }}
         >
-          <Features />
+          {/* We rely entirely on the 3D scene (Hero3D) for the graph display here */}
         </motion.div>
 
-        {/* SECTION 5: CALL TO ACTION (0.8 - 0.9) */}
+        {/* SECTION 5: CALL TO ACTION (0.92 - 1.0) */}
         <motion.div
           className={`fixed top-0 left-0 w-full h-screen flex flex-col items-center justify-center px-6 text-center ${textColorClass} transition-opacity duration-1000`}
           style={{
-            opacity: useTransform(scrollYProgress, [0.75, 0.85, 0.95], [0, 1, 0]),
+            opacity: useTransform(scrollYProgress, [0.90, 0.95, 1.0], [0, 1, 0]),
           }}
         >
           <h2 className="text-5xl md:text-[8vw] font-display font-black uppercase leading-[0.8] tracking-tighter mb-6 glitch" data-text="STOP SKIMMING.">
@@ -121,7 +173,12 @@ export default function LandingPage() {
 
       </div>
 
-      {/* SECTION 6: THE MASSIVE FOOTER BLOCK (Static end of document) */}
+      {/* SECTION 6: THE WHITE CARDS GAP FINDER / USE CASES (Static rendering before footer) */}
+      <div className="relative w-full bg-[#f0f0f0] z-20 pointer-events-auto py-32 border-b border-[#3C091E]/20">
+        <Features />
+      </div>
+
+      {/* SECTION 7: THE MASSIVE FOOTER BLOCK (Static end of document) */}
       <footer className="relative bg-[#050505] min-h-screen z-20 overflow-hidden flex flex-col justify-end pb-0">
         {/* Background massive glitch text */}
         <div className="absolute top-10 left-0 w-full overflow-hidden Mix-blend-overlay opacity-30 pointer-events-none flex justify-center mt-20">

@@ -17,17 +17,17 @@ const data = [
 
 function MetricCard({ title, value, sub, warning = false }: any) {
     return (
-        <div className={`p-6 bg-black/40 border border-[#3C091E]/30 relative overflow-hidden group hover:border-[#C02B0A]/50 transition-colors`}>
+        <div className={`p-4 bg-black/40 border border-[#3C091E]/30 relative overflow-hidden group hover:border-[#C02B0A]/50 transition-colors flex flex-col justify-between`}>
             {warning && (
                 <div className="absolute top-0 right-0 p-2 text-[#C02B0A]">
                     <AlertTriangle size={16} />
                 </div>
             )}
-            <h4 className="font-mono text-xs uppercase tracking-widest text-[#97494E] mb-2">{title}</h4>
-            <div className="text-4xl font-display font-black text-white tracking-tighter mb-4">
+            <h4 className="font-mono text-[10px] uppercase tracking-widest text-[#97494E] mb-2 pr-6 leading-tight">{title}</h4>
+            <div className="text-2xl lg:text-3xl font-display font-black text-white tracking-tighter mb-4 truncate">
                 {value}
             </div>
-            <div className="font-mono text-[9px] uppercase tracking-widest text-[#3C091E] flex items-center justify-between border-t border-[#3C091E]/20 pt-4">
+            <div className="font-mono text-[8px] uppercase tracking-widest text-[#3C091E] flex items-center justify-between border-t border-[#3C091E]/20 mt-auto pt-3">
                 <span>{sub}</span>
                 <ChevronRight size={12} />
             </div>
@@ -60,7 +60,7 @@ export default function FieldHealthDashboard() {
             </div>
 
             {/* Main KPI Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <MetricCard title="Arxion Credibility (RCI)" value="82.4%" sub="Global Field Average" />
                 <MetricCard title="Public Code Avail." value="34.1%" sub="12% decline vs 2025" warning />
                 <MetricCard title="Hyperparam Veil" value="68.9%" sub="Training params missing" warning />

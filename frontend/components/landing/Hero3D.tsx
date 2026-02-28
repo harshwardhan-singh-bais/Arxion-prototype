@@ -2,7 +2,7 @@
 
 import { useRef, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { Environment, PerspectiveCamera, Instances, Instance, SpotLight, Grid, Html, Float } from "@react-three/drei";
+import { Environment, PerspectiveCamera, Instances, Instance, SpotLight, Grid, Html, Line, Float } from "@react-three/drei";
 import * as THREE from "three";
 import { useScrollStore } from "@/lib/store";
 
@@ -30,88 +30,104 @@ function RedBadges() {
     return (
         <group ref={groupRef}>
             {badges.map((b, i) => (
-                <mesh key={i} position={new THREE.Vector3(...b.pos)} scale={new THREE.Vector3(b.scale, b.scale, b.scale)}>
-                    {/* Beveled Box / Coin */}
-                    <boxGeometry args={[1.5, 1.5, 0.2]} />
-                    <meshStandardMaterial color="#C02B0A" metalness={0.6} roughness={0.3} />
-                    {/* Add a generic tech icon shape inside the red coin */}
-                    <mesh position={[0, 0, 0.12]}>
-                        <torusGeometry args={[0.4, 0.05, 16, 32]} />
-                        <meshBasicMaterial color="#ffffff" />
+                <Float key={i} speed={2} rotationIntensity={1} floatIntensity={1} floatingRange={[-0.5, 0.5]}>
+                    <mesh position={new THREE.Vector3(...b.pos)} scale={new THREE.Vector3(b.scale, b.scale, b.scale)}>
+                        {/* Beveled Box / Coin */}
+                        <boxGeometry args={[1.5, 1.5, 0.2]} />
+                        <meshStandardMaterial color="#C02B0A" metalness={0.6} roughness={0.3} />
+                        {/* Add a generic tech icon shape inside the red coin */}
+                        <mesh position={[0, 0, 0.12]}>
+                            <torusGeometry args={[0.4, 0.05, 16, 32]} />
+                            <meshBasicMaterial color="#ffffff" />
+                        </mesh>
+                        <mesh position={[0, 0, -0.12]}>
+                            <torusGeometry args={[0.4, 0.05, 16, 32]} />
+                            <meshBasicMaterial color="#ffffff" />
+                        </mesh>
                     </mesh>
-                    <mesh position={[0, 0, -0.12]}>
-                        <torusGeometry args={[0.4, 0.05, 16, 32]} />
-                        <meshBasicMaterial color="#ffffff" />
-                    </mesh>
-                </mesh>
+                </Float>
             ))}
         </group>
     );
 }
 
-// Floating Features Palettes
-function FloatingFeatures() {
+
+// Feature Graph that stretches along the Z Axis
+function FeatureGraph() {
     const { progress } = useScrollStore();
 
-    // We want to show different groups of features based on progress.
-    // They pop up around the camera randomly as we fly forward.
+    // Scale features nodes so they only appear when we are in the graph section
+    const graphActive = progress > 0.40;
+
     const features = useMemo(() => [
-        // Group 1 (3 features): progress 0.10 - 0.20
-        { pos: [-5, 2, 8], title: "NEURAL CORRELATION", desc: "Evidence pointer linked. Confidence interval stabilized.", group: 1, font: "font-mono" },
-        { pos: [6, 4, 6], title: "EPISTEMIC GAP", desc: "Contradiction detected across dataset boundaries.", group: 1, font: "font-cyber" },
-        { pos: [1, -3, 10], title: "BASELINE DRIFT", desc: "Metrics misaligned with original methodology.", group: 1, font: "font-cyberlight" },
-
-        // Group 2 (4 features): progress 0.15 - 0.25
-        { pos: [5, 1, 4], title: "DATA SATURATION", desc: "Benchmark limits reached. Zero marginal gain.", group: 2, font: "font-mono" },
-        { pos: [-6, -2, 2], title: "REPRODUCIBILITY SCORE", desc: "Code and weights unavailable in 80% of branches.", group: 2, font: "font-cyber" },
-        { pos: [3, -4, 5], title: "SYNTHETIC DECAY", desc: "Model trained on generated artifacts.", group: 2, font: "font-cyberlight" },
-        { pos: [-3, 5, 0], title: "CITATION GRAPH", desc: "Self-referential loop detected. Verification required.", group: 2, font: "font-mono" },
-
-        // Group 3 (4 features): progress 0.20 - 0.30
-        { pos: [-5, 3, 0], title: "COMPUTE ASYMMETRY", desc: "Hardware constraints invalidate comparison.", group: 3, font: "font-cyber" },
-        { pos: [4, -1, 3], title: "HYPERPARAMETER VEIL", desc: "Critical training parameters omitted from paper.", group: 3, font: "font-cyberlight" },
-        { pos: [2, 4, -2], title: "METHODOLOGICAL FLAW", desc: "Invalid ablation study. Core hypothesis unproven.", group: 3, font: "font-mono" },
-        { pos: [-4, -4, 1], title: "TRUTH MATRIX", desc: "Converging multi-agent consensus achieved.", group: 3, font: "font-cyber" },
-
-        // Group 4 (3 features): progress 0.25 - 0.35
-        { pos: [5, 2, -1], title: "ONTOLOGICAL SHIFT", desc: "Definition of core metric has changed over time.", group: 4, font: "font-cyberlight" },
-        { pos: [-6, 1, -3], title: "BLIND SPOT", desc: "No known literature addressing this specific node.", group: 4, font: "font-mono" },
-        { pos: [0, -2, 0], title: "ARXION CORE", desc: "Intelligence extraction sequence complete.", group: 4, font: "font-cyber" },
+        { id: 0, pos: [4, 2, 25], title: "PDF UPLOAD INGESTION", desc: "Drag & drop artifacts." },
+        { id: 1, pos: [-4, -1, 20], title: "INTELLIGENT CHUNKING", desc: "LangChain semantic splitters." },
+        { id: 2, pos: [5, -3, 15], title: "ENTITY EXTRACTION", desc: "Strict JSON schema via Pydantic." },
+        { id: 3, pos: [-6, 3, 10], title: "VECTOR STORAGE", desc: "Qdrant claim embeddings." },
+        { id: 4, pos: [3, 1, 5], title: "REPRODUCIBILITY SCORE", desc: "Compute code availability breakdown." },
+        { id: 5, pos: [-3, -4, 0], title: "CONFIDENCE SCORE", desc: "Claim-to-evidence ratio." },
+        { id: 6, pos: [5, -2, -5], title: "RISK FLAGS", desc: "No code links flagged." },
+        { id: 7, pos: [-5, 4, -10], title: "CREDIBILITY INDEX (RCI)", desc: "Global field aggregation metric." },
+        { id: 8, pos: [4, 0, -15], title: "LIT MATRIX", desc: "Tag, topic, dataset comparison." },
+        { id: 9, pos: [-3, -3, -20], title: "KNOWLEDGE GRAPH", desc: "Paper-to-method network edges." },
+        { id: 10, pos: [6, 2, -25], title: "GAP INTELLIGENCE", desc: "Dataset saturation detection." },
+        { id: 11, pos: [-4, -1, -30], title: "CONTRADICTION FEED", desc: "Cross-paper empirical warnings." },
+        { id: 12, pos: [3, 4, -35], title: "EFFORT ESTIMATOR", desc: "Compute GPU limits & risks." },
+        { id: 13, pos: [-5, -2, -40], title: "CHAT WITH MATRIX", desc: "Semantic RAG verified queries." },
+        { id: 14, pos: [4, 1, -45], title: "EXPORT API", desc: "Generate BibTeX and CSVs." },
+        { id: 15, pos: [-2, 3, -50], title: "ARXION CORE", desc: "Differentiated strategic engine." },
     ], []);
+
+    // Create edges connecting the sequence
+    const edges = useMemo(() => {
+        const lines = [];
+        for (let i = 0; i < features.length - 1; i++) {
+            lines.push([features[i].pos, features[i + 1].pos]);
+        }
+        // Add some cross-branches for graph aesthetic
+        lines.push([features[2].pos, features[5].pos]);
+        lines.push([features[4].pos, features[8].pos]);
+        lines.push([features[9].pos, features[12].pos]);
+        lines.push([features[11].pos, features[15].pos]);
+        return lines;
+    }, [features]);
 
     return (
         <group>
-            {features.map((feat, i) => {
-                let isVisible = false;
-                if (feat.group === 1 && progress > 0.08 && progress < 0.22) isVisible = true;
-                if (feat.group === 2 && progress > 0.14 && progress < 0.27) isVisible = true;
-                if (feat.group === 3 && progress > 0.20 && progress < 0.33) isVisible = true;
-                if (feat.group === 4 && progress > 0.26 && progress < 0.38) isVisible = true;
+            {/* Draw network lines between nodes */}
+            {edges.map((e, i) => (
+                <Line key={`e-${i}`} points={[new THREE.Vector3(...e[0]), new THREE.Vector3(...e[1])]} color="#C02B0A" lineWidth={1.5} opacity={graphActive ? 0.4 : 0} transparent />
+            ))}
 
+            {/* Render Nodes as pure HTML tooltips floating in space */}
+            {features.map((feat, i) => {
                 return (
-                    // Using drei's Float to make the card bob and wander effortlessly in mid-air
-                    <Float key={i} speed={2} rotationIntensity={0.1} floatIntensity={1} floatingRange={[-0.5, 0.5]}>
-                        <Html position={new THREE.Vector3(...feat.pos)} transform sprite>
-                            <div className={`transition-all duration-1000 ${isVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-50 pointer-events-none'}`}>
-                                <div className="flex items-center gap-2">
-                                    <div className="border border-[#C02B0A]/30 bg-black/80 backdrop-blur pb-2 p-4 min-w-[200px] max-w-[260px] clip-card">
-                                        <div className={`flex items-center gap-2 mb-2 ${feat.font === 'font-mono' ? 'font-mono uppercase text-[10px]' : feat.font === 'font-cyber' ? 'font-cyber text-xs uppercase tracking-widest' : 'font-cyberlight text-sm uppercase tracking-widest font-bold'} text-[#C02B0A]`}>
-                                            <span className="w-1.5 h-1.5 bg-[#C02B0A]" />
-                                            {feat.title}
-                                        </div>
-                                        <p className="text-white text-[10px] font-mono opacity-80 leading-relaxed uppercase">
-                                            {feat.desc}
-                                        </p>
-                                    </div>
+                    <Html key={i} position={new THREE.Vector3(...feat.pos)} transform sprite>
+                        <div className={`transition-all duration-1000 ${graphActive ? 'opacity-100 scale-100' : 'opacity-0 scale-50 pointer-events-none'} relative group`}>
+
+                            {/* The glowing dot anchor */}
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#C02B0A] blur-[4px] group-hover:scale-150 transition-transform" />
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-white" />
+
+                            {/* Connecting dash to card */}
+                            <div className="absolute top-1/2 left-1/2 w-8 h-[1px] bg-[#C02B0A]" />
+
+                            <div className="absolute top-1/2 left-[calc(50%+32px)] -translate-y-1/2 border border-[#C02B0A]/30 bg-black/80 backdrop-blur p-4 min-w-[220px] max-w-[280px] clip-card hover:border-[#C02B0A] transition-colors pointer-events-auto cursor-pointer">
+                                <div className={`flex items-center gap-2 mb-2 font-mono uppercase text-[10px] tracking-widest text-[#C02B0A] group-hover:text-white transition-colors`}>
+                                    {feat.title}
                                 </div>
+                                <p className="text-white text-[9px] font-mono opacity-80 leading-relaxed uppercase">
+                                    {feat.desc}
+                                </p>
                             </div>
-                        </Html>
-                    </Float>
+                        </div>
+                    </Html>
                 );
             })}
         </group>
     );
 }
+
 
 function SceneController() {
     const { progress } = useScrollStore();
@@ -126,8 +142,8 @@ function SceneController() {
 
         if (progress < 0.2) {
             currentColor = startColor.lerp(midColor, progress / 0.2);
-        } else if (progress < 0.6) {
-            currentColor = midColor.lerp(endColor, (progress - 0.2) / 0.4); // Turns white around progress 0.6
+        } else if (progress < 0.45) {
+            currentColor = midColor.lerp(endColor, (progress - 0.2) / 0.25); // Turns white around progress 0.45
         } else {
             currentColor = endColor; // Stays white for the rest
         }
@@ -142,6 +158,17 @@ function SceneController() {
 export default function Hero3D() {
     const { progress } = useScrollStore();
 
+    // Calculate camera position dynamically based on narrative sections
+    // Phase 1: Slow drift while text floats (0 -> 0.4)
+    // Phase 2: High-speed blast through the feature graph (0.4 -> 1.0)
+    const cameraZ = progress < 0.40
+        ? 30 - (progress * 15) // Drops from 30 down to 24 slowly
+        : 24 - ((progress - 0.40) * 160); // Drops from 24 down to -72 rapidly
+
+    // Color transition calculations: 
+    // Go white when the Classy Capabilities heading comes in (approx 0.35)
+    const isGraphSection = progress > 0.35;
+
     return (
         <div className="fixed inset-0 w-full h-screen -z-10 bg-transparent pointer-events-none">
             <Canvas shadows>
@@ -149,9 +176,9 @@ export default function Hero3D() {
 
                 <PerspectiveCamera
                     makeDefault
-                    position={[0, progress * 10, 15 - progress * 15]} // Camera flies up and in
+                    position={[0, progress * 6, cameraZ]}
                     fov={45}
-                    rotation={[-progress * 0.4, 0, 0]}
+                    rotation={[0, 0, 0]}
                 />
 
                 <ambientLight intensity={progress > 0.4 ? 0.8 : 0.2} />
@@ -175,13 +202,14 @@ export default function Hero3D() {
                 {/* Spinning Solais-style Red Coins */}
                 <RedBadges />
 
-                {/* Floating Feature Palettes spawning and spawning */}
-                <FloatingFeatures />
+
+                {/* Continuous 3D Knowledge Graph appearing during Phase 2 */}
+                <FeatureGraph />
 
                 {/* The Solais style perspective floor grid */}
                 <Grid
-                    position={[0, -10 - progress * 5, 0]}
-                    args={[200, 200]}
+                    position={[0, -10 - progress * 5, -20]}
+                    args={[200, 400]}
                     cellSize={2}
                     cellThickness={progress > 0.4 ? 1 : 0.5}
                     cellColor={progress > 0.4 ? "#cccccc" : "#601020"}
