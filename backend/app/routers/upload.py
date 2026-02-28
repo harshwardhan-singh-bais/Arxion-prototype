@@ -1,11 +1,13 @@
 """
 Upload router — handles PDF and raw text ingestion.
 POST /api/v1/upload/pdf
+POST /api/v1/upload/pdfs    (multi-file)
 POST /api/v1/upload/text
 """
 import uuid
 import logging
 from pathlib import Path
+from typing import List
 from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Form
 
 from app.core.config import settings
@@ -33,7 +35,6 @@ async def upload_pdf(
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only .pdf files are accepted.")
 
-    # Read and size-check
     content = await file.read()
     if len(content) > MAX_BYTES:
         raise HTTPException(
@@ -50,7 +51,7 @@ async def upload_pdf(
 
     paper = PaperInDB(
         id=paper_id,
-        title=file.filename,          # Placeholder — Gemini will extract the real title
+        title=file.filename,
         filename=file.filename,
         file_path=str(file_path),
         status=PaperStatus.INGESTED,
@@ -67,6 +68,68 @@ async def upload_pdf(
     )
 
 
+@router.post("/upload/pdfs", response_model=List[UploadResponse], summary="Upload multiple research paper PDFs")
+async def upload_multiple_pdfs(
+    background_tasks: BackgroundTasks,
+    files: List[UploadFile] = File(..., description="One or more PDF files"),
+):
+    """
+    Accept multiple PDFs, save each to disk, register them as INGESTED,
+    and kick off independent background pipelines.
+    """
+    if not files:
+        raise HTTPException(status_code=400, detail="No files provided.")
+
+    responses: List[UploadResponse] = []
+
+    for file in files:
+        if not file.filename or not file.filename.lower().endswith(".pdf"):
+            responses.append(UploadResponse(
+                paper_id="",
+                filename=file.filename or "unknown",
+                status=PaperStatus.FAILED,
+                message=f"Skipped: '{file.filename}' is not a .pdf file.",
+            ))
+            continue
+
+        content = await file.read()
+        if len(content) > MAX_BYTES:
+            responses.append(UploadResponse(
+                paper_id="",
+                filename=file.filename,
+                status=PaperStatus.FAILED,
+                message=f"Skipped: exceeds {settings.MAX_UPLOAD_SIZE_MB} MB limit.",
+            ))
+            continue
+
+        paper_id = str(uuid.uuid4())
+        safe_name = f"{paper_id}_{file.filename}"
+        file_path = UPLOAD_DIR / safe_name
+
+        file_path.write_bytes(content)
+        logger.info(f"Saved multi-PDF upload: {file_path}")
+
+        paper = PaperInDB(
+            id=paper_id,
+            title=file.filename,
+            filename=file.filename,
+            file_path=str(file_path),
+            status=PaperStatus.INGESTED,
+        )
+        save_paper(paper)
+
+        background_tasks.add_task(run_ingestion_pipeline, paper)
+
+        responses.append(UploadResponse(
+            paper_id=paper_id,
+            filename=file.filename,
+            status=PaperStatus.INGESTED,
+            message=f"Paper received. Processing started.",
+        ))
+
+    return responses
+
+
 @router.post("/upload/text", response_model=UploadResponse, summary="Ingest raw text or JSON")
 async def upload_text(
     background_tasks: BackgroundTasks,
@@ -74,7 +137,7 @@ async def upload_text(
     title: str = Form(default="Untitled Paper"),
 ):
     """
-    Accept raw text (copy-paste or JSON body), register as INGESTED, 
+    Accept raw text (copy-paste or JSON body), register as INGESTED,
     and kick off the background pipeline.
     """
     if len(text.strip()) < 100:
@@ -94,17 +157,12 @@ async def upload_text(
     )
     save_paper(paper)
 
-    # Patch the pipeline to handle plain .txt files
     async def _text_pipeline(p: PaperInDB):
         from app.models.paper import PaperStatus
         from app.models.store import update_paper
         from app.services.ingestion import run_ingestion_pipeline
         from app.services.extractor import extract_text_from_pdf
 
-        # Monkey-patch: read as plain text (not PDF)
-        original_extract = extract_text_from_pdf.__module__
-
-        # Override extraction for this run
         import app.services.ingestion as ing
         original_fn = ing.extract_text_from_pdf
 

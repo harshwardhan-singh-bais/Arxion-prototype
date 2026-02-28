@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
-import { Activity, LayoutGrid, Network, UploadCloud } from "lucide-react";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 export function Navbar() {
     const pathname = usePathname();
@@ -34,11 +34,34 @@ export function Navbar() {
                 )}
 
                 <div className="flex items-center gap-6">
-                    {isLanding && (
-                        <Link href="/login" className="text-muted-foreground hover:text-white transition-colors">
-                            LOG IN
-                        </Link>
-                    )}
+                    {/* Signed Out: Show LOG IN link */}
+                    <SignedOut>
+                        {isLanding && (
+                            <Link href="/sign-in" className="text-muted-foreground hover:text-white transition-colors">
+                                LOG IN
+                            </Link>
+                        )}
+                    </SignedOut>
+
+                    {/* Signed In: Show UserButton */}
+                    <SignedIn>
+                        <UserButton
+                            afterSignOutUrl="/"
+                            appearance={{
+                                elements: {
+                                    userButtonTrigger: "rounded-full focus:shadow-none focus:outline-none",
+                                    userButtonBox: "w-8 h-8",
+                                    avatarBox: "!rounded-full w-8 h-8 border border-[#3C091E]/40 hover:brightness-125 transition-all duration-200 cursor-pointer",
+                                    avatarImage: "!rounded-full",
+                                    userButtonPopoverCard: "bg-[#0a0a0a] border border-[#3C091E]/40 rounded-none",
+                                    userButtonPopoverActionButton: "hover:bg-[#C02B0A]/10 rounded-none",
+                                    userButtonPopoverActionButtonText: "text-white font-mono text-xs tracking-widest",
+                                    userButtonPopoverFooter: "hidden",
+                                },
+                            }}
+                        />
+                    </SignedIn>
+
                     <Button
                         asChild
                         className="bg-secondary hover:bg-secondary/90 text-white clip-button h-8 rounded-none px-6 shadow-[0_0_15px_rgba(192,43,10,0.5)] transition-all font-mono"

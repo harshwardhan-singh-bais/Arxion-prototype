@@ -30,10 +30,17 @@ class Settings(BaseSettings):
     # Gemini chat model
     GEMINI_MODEL: str = "gemini-1.5-flash"
 
+    # Neon PostgreSQL
+    DATABASE_URL: str = "postgresql+asyncpg://user:pass@host/dbname?sslmode=require"
+
+    # Clerk Auth
+    CLERK_ISSUER_URL: str = "https://clerk.arxion.com"
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = True
+        extra = "ignore"
 
 
 settings = Settings()

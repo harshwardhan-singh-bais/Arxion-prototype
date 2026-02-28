@@ -1,22 +1,104 @@
 "use client";
 
-import { useState } from "react";
-import { UploadCloud, FileText, CheckCircle, Database } from "lucide-react";
+import { useState, useRef, useCallback } from "react";
+import { UploadCloud, FileText, CheckCircle, XCircle, Database, X } from "lucide-react";
 import { motion } from "framer-motion";
 
-export default function IngestionPage() {
-    const [pipelineState, setPipelineState] = useState<"idle" | "uploading" | "processing" | "done">("idle");
+interface FileUpload {
+    file: File;
+    id: string;
+    status: "pending" | "uploading" | "processing" | "done" | "error";
+    paperId?: string;
+    message?: string;
+    progress: number;
+}
 
-    const handleSimulateDrop = () => {
-        setPipelineState("uploading");
-        setTimeout(() => setPipelineState("processing"), 2000);
-        setTimeout(() => setPipelineState("done"), 5000);
+const STATUS_LABELS: Record<string, { text: string; color: string }> = {
+    pending: { text: "PENDING", color: "text-[#97494E] border-[#97494E]/30" },
+    uploading: { text: "UPLOADING", color: "text-[#C02B0A] border-[#C02B0A]/30 animate-pulse" },
+    processing: { text: "PROCESSING", color: "text-[#C02B0A] border-[#C02B0A]/30 animate-pulse" },
+    done: { text: "INGESTED", color: "text-green-400 border-green-800/30" },
+    error: { text: "FAILED", color: "text-red-400 border-red-800/30" },
+};
+
+export default function IngestionPage() {
+    const [files, setFiles] = useState<FileUpload[]>([]);
+    const [isDragging, setIsDragging] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    const addFiles = useCallback((newFiles: FileList | File[]) => {
+        const uploads: FileUpload[] = Array.from(newFiles)
+            .filter(f => f.name.toLowerCase().endsWith(".pdf"))
+            .map(f => ({
+                file: f,
+                id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+                status: "pending" as const,
+                progress: 0,
+            }));
+        setFiles(prev => [...prev, ...uploads]);
+    }, []);
+
+    const removeFile = (id: string) => {
+        setFiles(prev => prev.filter(f => f.id !== id));
     };
+
+    const uploadAll = async () => {
+        const pending = files.filter(f => f.status === "pending");
+        if (pending.length === 0) return;
+
+        // Upload all at once via multi-endpoint
+        const formData = new FormData();
+        pending.forEach(f => formData.append("files", f.file));
+
+        // Mark as uploading
+        setFiles(prev => prev.map(f =>
+            pending.find(p => p.id === f.id) ? { ...f, status: "uploading" as const, progress: 30 } : f
+        ));
+
+        try {
+            const res = await fetch("http://localhost:8000/api/v1/upload/pdfs", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!res.ok) throw new Error("Upload failed");
+
+            const results = await res.json();
+
+            setFiles(prev => prev.map(f => {
+                const idx = pending.findIndex(p => p.id === f.id);
+                if (idx === -1) return f;
+                const result = results[idx];
+                if (!result) return f;
+
+                return {
+                    ...f,
+                    status: result.status === "FAILED" ? "error" as const : "done" as const,
+                    paperId: result.paper_id,
+                    message: result.message,
+                    progress: 100,
+                };
+            }));
+        } catch (e) {
+            setFiles(prev => prev.map(f =>
+                pending.find(p => p.id === f.id) ? { ...f, status: "error" as const, message: "Upload failed" } : f
+            ));
+        }
+    };
+
+    const handleDrop = (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragging(false);
+        if (e.dataTransfer.files.length > 0) addFiles(e.dataTransfer.files);
+    };
+
+    const pendingCount = files.filter(f => f.status === "pending").length;
+    const doneCount = files.filter(f => f.status === "done").length;
 
     return (
         <div className="h-full w-full flex flex-col gap-8 max-w-6xl mx-auto">
 
-            {/* Top Header */}
+            {/* Header */}
             <div className="flex justify-between items-end border-b border-[#3C091E]/30 pb-6">
                 <div>
                     <div className="font-mono text-[10px] text-[#C02B0A] tracking-[0.3em] uppercase mb-2 flex items-center gap-3">
@@ -27,53 +109,40 @@ export default function IngestionPage() {
                         DATA PIPELINE
                     </h1>
                 </div>
+                {files.length > 0 && (
+                    <div className="font-mono text-[9px] text-[#97494E] tracking-widest uppercase">
+                        {doneCount}/{files.length} Processed
+                    </div>
+                )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-4">
 
-                {/* LEFT: DRAG AND DROP ZONE */}
+                {/* Drag & Drop Zone */}
                 <div
-                    className={`border-2 border-dashed ${pipelineState === "idle" ? 'border-[#3C091E] hover:border-[#C02B0A]' : 'border-[#C02B0A]'} bg-[#050505] clip-card-solais p-12 flex flex-col items-center justify-center text-center cursor-pointer transition-colors relative min-h-[400px]`}
-                    onClick={handleSimulateDrop}
+                    className={`border-2 border-dashed ${isDragging ? "border-[#C02B0A] bg-[#C02B0A]/[0.03]" : "border-[#3C091E] hover:border-[#C02B0A]"} bg-[#050505] p-12 flex flex-col items-center justify-center text-center cursor-pointer transition-colors relative min-h-[400px]`}
+                    onClick={() => inputRef.current?.click()}
+                    onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                    onDragLeave={() => setIsDragging(false)}
+                    onDrop={handleDrop}
                 >
-                    {pipelineState === "idle" ? (
-                        <>
-                            <UploadCloud size={48} className="text-[#3C091E] mb-6" />
-                            <h3 className="font-mono text-white text-sm uppercase tracking-widest font-bold mb-2">INITIALIZE UPLOAD SEQUENCE</h3>
-                            <p className="font-mono text-[10px] text-[#97494E] max-w-xs leading-relaxed uppercase">
-                                Drag & Drop exact PDF artifacts or raw JSON configurations. System will autonomously trigger entity extraction protocol.
-                            </p>
-                        </>
-                    ) : pipelineState === "uploading" ? (
-                        <>
-                            <UploadCloud size={48} className="text-[#C02B0A] mb-6 animate-bounce" />
-                            <h3 className="font-mono text-white text-sm uppercase tracking-widest font-bold mb-2">UPLOADING TO S3</h3>
-                            <div className="w-48 h-1 bg-[#3C091E] mt-4 relative overflow-hidden">
-                                <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 2 }} className="absolute top-0 left-0 h-full bg-[#C02B0A]" />
-                            </div>
-                        </>
-                    ) : pipelineState === "processing" ? (
-                        <>
-                            <Database size={48} className="text-white mb-6 animate-pulse" />
-                            <h3 className="font-mono text-white text-sm uppercase tracking-widest font-bold mb-2 glitch" data-text="TRIGGERING EXTRACTORS">TRIGGERING EXTRACTORS</h3>
-                            <p className="font-mono text-[10px] text-[#C02B0A] max-w-xs leading-relaxed uppercase mt-4">
-                                Chunking text. Generating embeddings. Scanning claims against Qdrant Vector Matrix...
-                            </p>
-                        </>
-                    ) : (
-                        <>
-                            <CheckCircle size={48} className="text-green-500 mb-6" />
-                            <h3 className="font-mono text-white text-sm uppercase tracking-widest font-bold mb-2">INGESTION COMPLETE</h3>
-                            <p className="font-mono text-[10px] text-green-500 max-w-xs leading-relaxed uppercase mt-2">
-                                9 Entities extracted. 14 Evidence pointers mapped. Added to matrix.
-                            </p>
-                            <button className="mt-8 border border-white/20 text-white font-mono text-xs px-6 py-2 uppercase hover:bg-white hover:text-black transition-colors" onClick={(e) => { e.stopPropagation(); setPipelineState("idle"); }}>
-                                RESET PIPELINE
-                            </button>
-                        </>
-                    )}
+                    <input
+                        ref={inputRef}
+                        type="file"
+                        accept=".pdf"
+                        multiple
+                        className="hidden"
+                        onChange={(e) => { if (e.target.files) addFiles(e.target.files); e.target.value = ""; }}
+                    />
 
-                    {/* Diagonal accent cuts */}
+                    <UploadCloud size={48} className={`${isDragging ? "text-[#C02B0A]" : "text-[#3C091E]"} mb-6 transition-colors`} />
+                    <h3 className="font-mono text-white text-sm uppercase tracking-widest font-bold mb-2">
+                        {isDragging ? "DROP FILES HERE" : "INITIALIZE UPLOAD SEQUENCE"}
+                    </h3>
+                    <p className="font-mono text-[10px] text-[#97494E] max-w-xs leading-relaxed uppercase">
+                        Drag & drop multiple PDF artifacts. System will autonomously trigger entity extraction protocol for each file.
+                    </p>
+
                     <div className="absolute bottom-4 right-4 flex gap-1">
                         <div className="w-1 h-1 bg-[#3C091E]" />
                         <div className="w-1 h-3 bg-[#3C091E]" />
@@ -82,41 +151,66 @@ export default function IngestionPage() {
                     </div>
                 </div>
 
-                {/* RIGHT: LIVE PROCESSING PIPELINE LOGS */}
-                <div className="flex flex-col bg-black/60 border border-[#3C091E]/30 p-8 clip-card h-full">
-                    <h4 className="font-mono text-xs uppercase tracking-widest text-[#97494E] mb-8 border-b border-[#3C091E]/30 pb-4">Extraction Logs</h4>
-
-                    <div className="flex-1 space-y-4 font-mono text-[10px] text-[#97494E] uppercase tracking-wide overflow-hidden flex flex-col-reverse relative">
-
-                        {/* Fake glowing line to indicate active scanning */}
-                        {pipelineState === "processing" && (
-                            <motion.div
-                                initial={{ top: "-10px" }}
-                                animate={{ top: "100%" }}
-                                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-                                className="absolute left-0 w-full h-[1px] bg-[#C02B0A] shadow-[0_0_10px_rgba(192,43,10,1)] z-10"
-                            />
+                {/* File List & Status */}
+                <div className="flex flex-col bg-black/60 border border-[#3C091E]/30 p-6 h-full min-h-[400px]">
+                    <div className="flex items-center justify-between mb-6 border-b border-[#3C091E]/30 pb-4">
+                        <h4 className="font-mono text-xs uppercase tracking-widest text-[#97494E]">Upload Queue</h4>
+                        {pendingCount > 0 && (
+                            <button
+                                onClick={uploadAll}
+                                className="px-4 py-1.5 bg-[#C02B0A] text-white font-mono text-[9px] tracking-[0.2em] uppercase hover:bg-[#C02B0A]/80 transition-colors"
+                            >
+                                Upload {pendingCount} File{pendingCount > 1 ? "s" : ""}
+                            </button>
                         )}
-
-                        {pipelineState === "done" && (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-green-500 flex items-center gap-2 py-2">
-                                <span>{">"}</span> [SYS] ALL PROTOCOLS SUCCESSFUL. ARXION CREDIBILITY: 88.2%
-                            </motion.div>
-                        )}
-                        {(pipelineState === "processing" || pipelineState === "done") && (
-                            <>
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="flex items-center gap-2 py-1"><span className="text-[#C02B0A]">{"[✓]"}</span> Extracted dataset baseline claims (Section 4.1)</motion.div>
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="flex items-center gap-2 py-1"><span className="text-[#C02B0A]">{"[✓]"}</span> 2 Contradictions detected vs baseline paper ID#4491</motion.div>
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="flex items-center gap-2 py-1"><span className="text-[#C02B0A]">{"[✓]"}</span> Validated JSON schema. Stored in NeonDB</motion.div>
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }} className="flex items-center gap-2 py-1"><span className="text-[#C02B0A]">{"[✓]"}</span> Push Embeddings to Qdrant (184 vectors)</motion.div>
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0 }} className="flex items-center gap-2 py-1"><span className="text-[#C02B0A]">{"[✓]"}</span> LangChain semantic chunking complete</motion.div>
-                            </>
-                        )}
-                        {(pipelineState === "uploading" || pipelineState === "processing" || pipelineState === "done") && (
-                            <div className="flex items-center gap-2 py-1"><span className="text-white">{"[SYS]"}</span> S3 Object Created. Initializing Pipeline.</div>
-                        )}
-                        <div className="flex items-center gap-2 py-1 opacity-50"><span className="text-white">{"[-]"}</span> WAITING FOR ARTIFACT...</div>
                     </div>
+
+                    {files.length === 0 ? (
+                        <div className="flex-1 flex items-center justify-center">
+                            <span className="font-mono text-[10px] text-[#3C091E] uppercase tracking-widest">
+                                WAITING FOR ARTIFACTS...
+                            </span>
+                        </div>
+                    ) : (
+                        <div className="flex-1 space-y-3 overflow-y-auto">
+                            {files.map((f, i) => (
+                                <motion.div
+                                    key={f.id}
+                                    initial={{ opacity: 0, x: -10 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: i * 0.05 }}
+                                    className="flex items-center gap-3 p-3 bg-black/40 border border-[#3C091E]/20 group"
+                                >
+                                    <FileText size={14} className={f.status === "done" ? "text-green-400" : f.status === "error" ? "text-red-400" : "text-[#97494E]"} />
+                                    <div className="flex-1 min-w-0">
+                                        <div className="font-mono text-[10px] text-white truncate">{f.file.name}</div>
+                                        <div className="font-mono text-[8px] text-[#3C091E] uppercase tracking-widest">
+                                            {(f.file.size / 1024 / 1024).toFixed(1)} MB
+                                        </div>
+                                        {/* Progress bar */}
+                                        {(f.status === "uploading" || f.status === "done") && (
+                                            <div className="w-full h-[2px] bg-[#3C091E]/30 mt-1.5 overflow-hidden">
+                                                <motion.div
+                                                    className={`h-full ${f.status === "done" ? "bg-green-500" : "bg-[#C02B0A]"}`}
+                                                    initial={{ width: "0%" }}
+                                                    animate={{ width: `${f.progress}%` }}
+                                                    transition={{ duration: 0.5 }}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <span className={`font-mono text-[8px] tracking-[0.15em] uppercase border px-1.5 py-0.5 ${STATUS_LABELS[f.status]?.color || ""}`}>
+                                        {STATUS_LABELS[f.status]?.text}
+                                    </span>
+                                    {f.status === "pending" && (
+                                        <button onClick={() => removeFile(f.id)} className="text-[#3C091E] hover:text-[#C02B0A] opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <X size={12} />
+                                        </button>
+                                    )}
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
             </div>

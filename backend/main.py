@@ -4,20 +4,22 @@ from contextlib import asynccontextmanager
 
 from app.core.config import settings
 from app.core.database import init_qdrant
-from app.routers import papers, upload, status
+from app.core.database_sql import init_sql_db
+from app.routers import papers, upload, status, profile, gaps
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Initialize connections on startup."""
     await init_qdrant()
+    await init_sql_db()
     yield
 
 
 app = FastAPI(
     title="Arxion",
     description="Research Credibility & Intelligence Engine",
-    version="0.1.0",
+    version="0.2.0",
     lifespan=lifespan,
 )
 
@@ -32,8 +34,10 @@ app.add_middleware(
 app.include_router(upload.router, prefix="/api/v1", tags=["Upload"])
 app.include_router(papers.router, prefix="/api/v1", tags=["Papers"])
 app.include_router(status.router, prefix="/api/v1", tags=["Status"])
+app.include_router(profile.router, prefix="/api/v1", tags=["Profile"])
+app.include_router(gaps.router, prefix="/api/v1", tags=["Gaps"])
 
 
 @app.get("/health", tags=["Health"])
 async def health():
-    return {"status": "ok", "version": "0.1.0"}
+    return {"status": "ok", "version": "0.2.0"}
