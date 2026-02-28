@@ -1,13 +1,10 @@
 """
 Structured entity extraction using Gemini with strict JSON schema enforcement.
-Extracts: title, authors, abstract, claims, datasets, methods, metrics, 
+Extracts: title, authors, abstract, claims, datasets, methods, metrics,
 limitations, baseline, hyperparameters, compute, code/data links.
 """
-import json
 import logging
-import asyncio
-from functools import partial
-from app.core.gemini import get_generation_model
+from app.core.gemini import generate_json
 
 logger = logging.getLogger(__name__)
 
@@ -61,67 +58,35 @@ SCHEMA:
 Be thorough but precise. If a field is not mentioned in the paper, return null or an empty list.
 """
 
+_EMPTY_ENTITIES: dict = {
+    "title": None,
+    "authors": [],
+    "abstract": None,
+    "year": None,
+    "claims": [],
+    "datasets": [],
+    "methods": [],
+    "metrics": [],
+    "limitations": [],
+    "baseline": None,
+    "hyperparameters": {"disclosed": False, "details": None},
+    "compute": {"disclosed": False, "gpu_type": None, "gpu_hours": None, "details": None},
+    "code_link": None,
+    "data_link": None,
+    "tags": [],
+}
 
-async def extract_entities(paper_text: str, max_chars: int = 40000) -> dict:
+
+async def extract_entities(paper_text: str, max_chars: int = 40_000) -> dict:
     """
     Call Gemini to extract structured entities from raw paper text.
     Truncates to max_chars to stay within token limits.
-    Returns a dict matching the schema above (or best-effort partial).
+    Returns a dict matching the schema above, or a safe empty fallback on failure.
     """
-    truncated_text = paper_text[:max_chars]
-    prompt = f"{_SYSTEM_PROMPT}\n\nPAPER TEXT:\n{truncated_text}"
-
-    model = get_generation_model()
-
-    # Run blocking Gemini SDK call in a thread pool
-    loop = asyncio.get_event_loop()
-    response = await loop.run_in_executor(
-        None,
-        partial(_call_gemini, model, prompt),
-    )
-
-    return _parse_response(response)
-
-
-def _call_gemini(model, prompt: str) -> str:
-    """Synchronous Gemini call — runs in a thread executor."""
-    response = model.generate_content(
-        prompt,
-        generation_config={
-            "temperature": 0.1,  # Low temp for strict JSON output
-            "max_output_tokens": 8192,
-        },
-    )
-    return response.text
-
-
-def _parse_response(raw: str) -> dict:
-    """Clean and parse the JSON response from Gemini."""
-    # Strip markdown code fences if the model adds them
-    text = raw.strip()
-    if text.startswith("```"):
-        lines = text.split("\n")
-        text = "\n".join(lines[1:-1] if lines[-1].strip() == "```" else lines[1:])
+    prompt = f"{_SYSTEM_PROMPT}\n\nPAPER TEXT:\n{paper_text[:max_chars]}"
 
     try:
-        return json.loads(text)
-    except json.JSONDecodeError as e:
-        logger.error(f"Failed to parse Gemini JSON response: {e}\nRaw response:\n{text[:500]}")
-        # Return a safe minimal fallback
-        return {
-            "title": "Unknown",
-            "authors": [],
-            "abstract": None,
-            "year": None,
-            "claims": [],
-            "datasets": [],
-            "methods": [],
-            "metrics": [],
-            "limitations": [],
-            "baseline": None,
-            "hyperparameters": {"disclosed": False, "details": None},
-            "compute": {"disclosed": False, "gpu_type": None, "gpu_hours": None, "details": None},
-            "code_link": None,
-            "data_link": None,
-            "tags": [],
-        }
+        return await generate_json(prompt, temperature=0.1, max_tokens=8192)
+    except Exception as e:
+        logger.error(f"Entity extraction failed: {e}")
+        return dict(_EMPTY_ENTITIES)  # defensive copy

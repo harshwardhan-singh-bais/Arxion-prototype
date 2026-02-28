@@ -8,7 +8,7 @@ State lifecycle:   INGESTED → PROCESSING → PROCESSED | FAILED
 import logging
 from app.models.paper import PaperInDB, PaperStatus, ClaimData, EvidencePointer, DatasetData, MethodData, MetricResult, LimitationData, HyperparameterSignal, ComputeDisclosure
 from app.models.store import update_paper
-from app.services.extractor import extract_text_from_pdf
+from app.services.extractor import extract_text
 from app.services.chunker import chunk_text
 from app.services.vector_store import store_chunks, store_claims
 from app.services.entity_extractor import extract_entities
@@ -30,10 +30,7 @@ async def run_ingestion_pipeline(paper: PaperInDB) -> None:
     try:
         # ── Step 2: Raw text extraction ───────────────────────────────────────
         logger.info(f"[Pipeline] Extracting text for {paper.id}")
-        raw_text = extract_text_from_pdf(paper.file_path)
-
-        if not raw_text.strip():
-            raise ValueError("No text could be extracted from the uploaded file.")
+        raw_text = extract_text(paper.file_path)   # raises ValueError if empty
 
         # ── Step 3: Chunking ──────────────────────────────────────────────────
         logger.info(f"[Pipeline] Chunking text for {paper.id}")

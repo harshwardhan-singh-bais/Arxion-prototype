@@ -31,6 +31,7 @@ async def init_qdrant():
                 url=settings.QDRANT_URL,
                 api_key=settings.QDRANT_API_KEY,
                 prefer_grpc=False,   # REST is more reliable through cloud firewalls
+                check_version=False, # Suppress minor version mismatch warnings
             )
         else:
             _client = AsyncQdrantClient(

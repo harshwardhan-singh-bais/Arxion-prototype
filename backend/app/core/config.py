@@ -1,8 +1,16 @@
 from pydantic_settings import BaseSettings
+from pydantic import ConfigDict
 from typing import List
 
 
 class Settings(BaseSettings):
+    model_config = ConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        case_sensitive=True,
+        extra="ignore",   # silently ignore unknown .env keys
+    )
+
     # Application
     APP_NAME: str = "Arxion"
     DEBUG: bool = False
@@ -23,17 +31,15 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "uploads"
     MAX_UPLOAD_SIZE_MB: int = 50
 
-    # Gemini embedding model
+    # Embeddings
     EMBEDDING_MODEL: str = "models/text-embedding-004"
     EMBEDDING_DIMENSION: int = 768
 
-    # Gemini chat model
+    # Generation
     GEMINI_MODEL: str = "gemini-1.5-flash"
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
-        case_sensitive = True
+    # Auth (Component H)
+    JWT_SECRET: str = "arxion-dev-secret-change-in-production"
 
 
 settings = Settings()

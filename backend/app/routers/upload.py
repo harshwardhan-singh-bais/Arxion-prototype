@@ -74,14 +74,14 @@ async def upload_text(
     title: str = Form(default="Untitled Paper"),
 ):
     """
-    Accept raw text (copy-paste or JSON body), register as INGESTED, 
-    and kick off the background pipeline.
+    Accept raw text (copy-paste), save as a .txt file, and run the standard ingestion pipeline.
+    The extractor dispatches on .txt extension and reads it as plain text (no PDF parsing).
     """
     if len(text.strip()) < 100:
-        raise HTTPException(status_code=400, detail="Submitted text is too short.")
+        raise HTTPException(status_code=400, detail="Submitted text is too short (minimum 100 characters).")
 
     paper_id = str(uuid.uuid4())
-    filename = f"{paper_id}_raw.txt"
+    filename  = f"{paper_id}_raw.txt"
     file_path = UPLOAD_DIR / filename
     file_path.write_text(text, encoding="utf-8")
 
@@ -93,29 +93,7 @@ async def upload_text(
         status=PaperStatus.INGESTED,
     )
     save_paper(paper)
-
-    # Patch the pipeline to handle plain .txt files
-    async def _text_pipeline(p: PaperInDB):
-        from app.models.paper import PaperStatus
-        from app.models.store import update_paper
-        from app.services.ingestion import run_ingestion_pipeline
-        from app.services.extractor import extract_text_from_pdf
-
-        # Monkey-patch: read as plain text (not PDF)
-        original_extract = extract_text_from_pdf.__module__
-
-        # Override extraction for this run
-        import app.services.ingestion as ing
-        original_fn = ing.extract_text_from_pdf
-
-        def read_text_file(path):
-            return Path(path).read_text(encoding="utf-8")
-
-        ing.extract_text_from_pdf = read_text_file
-        await run_ingestion_pipeline(p)
-        ing.extract_text_from_pdf = original_fn
-
-    background_tasks.add_task(_text_pipeline, paper)
+    background_tasks.add_task(run_ingestion_pipeline, paper)
 
     return UploadResponse(
         paper_id=paper_id,
