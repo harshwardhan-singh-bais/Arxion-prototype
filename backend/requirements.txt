@@ -15,13 +15,14 @@ python-multipart==0.0.20
 # PDF extraction
 PyPDF2==3.0.1
 pdfminer.six==20240706
+pymupdf>=1.24.0
 
 # LangChain chunking
 langchain==0.3.23
 langchain-text-splitters==0.3.8
 
 # Google Gemini
-google-generativeai==0.8.4
+google-generativeai==0.8.6
 
 # Qdrant vector DB
 qdrant-client==1.13.3

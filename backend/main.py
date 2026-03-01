@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 
 from app.core.config import settings
-from app.core.database import init_qdrant
+from app.core.database import init_qdrant, get_qdrant_status
 from app.routers import papers, upload, status, credibility, matrix, intelligence, chat_export, auth
 
 
@@ -41,4 +41,9 @@ app.include_router(auth.router,         prefix="/api/v1", tags=["H · Auth"])
 
 @app.get("/health", tags=["Health"])
 async def health():
-    return {"status": "ok", "version": "0.1.0"}
+    qdrant = get_qdrant_status()
+    return {
+        "status": "ok" if qdrant["connected"] else "degraded",
+        "version": "0.1.0",
+        "qdrant": qdrant,
+    }

@@ -35,11 +35,22 @@ async def upload_pdf(
 
     # Read and size-check
     content = await file.read()
+    if len(content) == 0:
+        raise HTTPException(
+            status_code=400,
+            detail="Uploaded file is empty (0 bytes). Ensure the file is fully downloaded before uploading.",
+        )
+    if len(content) < 1024:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Uploaded file is too small ({len(content)} bytes). Is the PDF complete and valid?",
+        )
     if len(content) > MAX_BYTES:
         raise HTTPException(
             status_code=413,
             detail=f"File exceeds maximum size of {settings.MAX_UPLOAD_SIZE_MB} MB.",
         )
+
 
     paper_id = str(uuid.uuid4())
     safe_name = f"{paper_id}_{file.filename}"

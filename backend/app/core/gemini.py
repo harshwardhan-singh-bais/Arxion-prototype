@@ -27,20 +27,36 @@ def get_model() -> genai.GenerativeModel:
     return _model
 
 
-# ── Embeddings ─────────────────────────────────────────────────────────────────
+# Models to try in order — first one that succeeds wins.
+# embedding-001: works on v1beta (what google-generativeai SDK uses)
+# text-embedding-004: v1 only, needs newer SDK routing
+_EMBEDDING_MODELS = [
+    "models/embedding-001",        # v1beta compatible — always works
+    "models/text-embedding-004",   # v1 only — try if SDK is updated
+]
+
 
 async def get_embeddings(text: str) -> list[float]:
     """Generate a Gemini text embedding (async via thread executor)."""
     loop = asyncio.get_event_loop()
-    result = await loop.run_in_executor(
-        None,
-        lambda: genai.embed_content(
-            model=settings.EMBEDDING_MODEL,
-            content=text,
-            task_type="RETRIEVAL_DOCUMENT",
-        ),
-    )
-    return result["embedding"]
+    last_err: Exception | None = None
+
+    for model_name in _EMBEDDING_MODELS:
+        try:
+            result = await loop.run_in_executor(
+                None,
+                lambda m=model_name: genai.embed_content(
+                    model=m,
+                    content=text,
+                    task_type="RETRIEVAL_DOCUMENT",
+                ),
+            )
+            return result["embedding"]
+        except Exception as e:
+            logger.warning(f"Embedding failed with {model_name}: {e}")
+            last_err = e
+
+    raise RuntimeError(f"All embedding models failed. Last error: {last_err}")
 
 
 # ── Text generation ────────────────────────────────────────────────────────────
