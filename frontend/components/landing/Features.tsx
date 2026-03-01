@@ -31,20 +31,20 @@ export function Features() {
 
                 {/* Left Side Massive Title block */}
                 <div className="xl:w-1/3 flex flex-col justify-start xl:sticky xl:top-40 h-fit">
-                    <h2 className="text-6xl md:text-8xl font-display font-black uppercase leading-[0.9] tracking-tighter text-[#3C091E] mb-8" style={{ wordSpacing: '-10px' }}>
+                    <h2 className="text-6xl md:text-8xl font-display font-black uppercase leading-[0.9] tracking-tighter text-white mb-8" style={{ wordSpacing: '-10px' }}>
                         FIND YOUR<br />
-                        <span className="flex items-center">
-                            <span className="w-20 h-1 bg-[#3C091E] mr-6 opacity-30 mt-4" />
+                        <span className="flex items-center text-[#94a3b8]">
+                            <span className="w-20 h-1 bg-[#1e293b] mr-6 opacity-30 mt-4" />
                             USE CASE
                         </span>
                     </h2>
 
-                    <p className="font-mono text-[#3C091E] text-base leading-relaxed tracking-wide opacity-90 border-l border-[#3C091E]/20 pl-6">
+                    <p className="font-mono text-[#94a3b8] text-base leading-relaxed tracking-wide opacity-90 pl-6">
                         Arxion is built specifically for the teams responsible for ensuring reproducibility, discovering algorithmic gaps, and avoiding dead-end dataset combinations.
                     </p>
 
                     <div className="mt-12">
-                        <button className="border-2 border-[#3C091E] text-[#3C091E] px-8 py-4 font-mono uppercase tracking-widest text-sm font-bold hover:bg-[#3C091E] hover:text-white transition-colors clip-button">
+                        <button className="border border-white/10 text-white bg-white/5 hover:bg-white/10 px-8 py-4 font-mono uppercase tracking-widest text-sm font-bold transition-colors rounded-xl shadow-[0_0_30px_rgba(239,68,68,0.05)]">
                             GET STARTED
                         </button>
                     </div>
@@ -59,24 +59,24 @@ export function Features() {
                             whileInView={{ opacity: 1, x: 0 }}
                             viewport={{ once: true, margin: "-100px" }}
                             transition={{ delay: idx * 0.2 }}
-                            className="flex-shrink-0 w-[400px] bg-white border border-[#3C091E]/20 clip-card-solais flex flex-col justify-between shadow-2xl relative"
+                            className="flex-shrink-0 w-[400px] bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl flex flex-col justify-between shadow-[0_0_30px_rgba(239,68,68,0.05)] relative"
                         >
                             <div className="p-12">
                                 {/* Card Top Label */}
-                                <div className="flex items-center font-mono text-[#3C091E] text-xs font-bold tracking-widest mb-12">
+                                <div className="flex items-center font-mono text-[#ef4444] text-xs font-bold tracking-widest mb-12">
                                     <span>ARXION</span>
-                                    <div className="flex-1 border-b border-[#3C091E]/20 mx-4" />
+                                    <div className="flex-1 border-b border-[#1e293b]/20 mx-4" />
                                     <span>{ind.number}</span>
                                 </div>
 
                                 {/* Card Title */}
-                                <h3 className="text-4xl font-display font-black uppercase text-[#3C091E] leading-[0.9] mb-12">
+                                <h3 className="text-4xl font-display font-black uppercase text-white leading-[0.9] mb-12">
                                     <span className="block">{ind.title.split(' ')[0]}</span>
-                                    <span className="block">{ind.title.split(' ')[1]}</span>
+                                    <span className="block text-[#94a3b8]">{ind.title.split(' ')[1]}</span>
                                 </h3>
 
                                 {/* Card Description */}
-                                <p className="font-mono text-[#97494E] text-sm leading-relaxed tracking-wide">
+                                <p className="font-mono text-[#94a3b8] text-sm leading-relaxed tracking-wide">
                                     {ind.description}
                                 </p>
                             </div>
@@ -84,12 +84,12 @@ export function Features() {
                             {/* Barcode bottom accent */}
                             <div className="p-8 flex justify-end">
                                 <div className="flex gap-1 h-6">
-                                    <div className="w-1 bg-[#3C091E]" />
-                                    <div className="w-1 bg-[#3C091E]" />
-                                    <div className="w-1 bg-[#3C091E]" />
-                                    <div className="w-0.5 bg-[#3C091E]" />
-                                    <div className="w-1.5 bg-[#3C091E]" />
-                                    <div className="w-1 bg-[#3C091E]" />
+                                    <div className="w-1 bg-white/20" />
+                                    <div className="w-1 bg-white/20" />
+                                    <div className="w-1 bg-white/20" />
+                                    <div className="w-0.5 bg-white/20" />
+                                    <div className="w-1.5 bg-white/20" />
+                                    <div className="w-1 bg-white/20" />
                                 </div>
                             </div>
                         </motion.div>

@@ -15,8 +15,8 @@ interface Paper {
 }
 
 const STATUS_COLORS: Record<string, string> = {
-    INGESTED: "bg-[#97494E]/20 text-[#97494E] border-[#97494E]/30",
-    PROCESSING: "bg-[#C02B0A]/20 text-[#C02B0A] border-[#C02B0A]/30 animate-pulse",
+    INGESTED: "bg-[#94a3b8]/20 text-[#94a3b8] border-[#94a3b8]/30",
+    PROCESSING: "bg-[#ef4444]/20 text-[#ef4444] border-[#ef4444]/30 animate-pulse",
     PROCESSED: "bg-green-900/20 text-green-400 border-green-800/30",
     FAILED: "bg-red-900/30 text-red-400 border-red-800/30",
 };
@@ -105,37 +105,37 @@ export default function PapersPage() {
         <div className="h-full w-full flex flex-col gap-8">
 
             {/* Header */}
-            <div className="flex justify-between items-end border-b border-[#3C091E]/30 pb-6">
+            <div className="flex justify-between items-end border-b border-[#1e293b]/30 pb-6">
                 <div>
-                    <div className="font-mono text-[10px] text-[#C02B0A] tracking-[0.3em] uppercase mb-2 flex items-center gap-3">
-                        <div className="w-4 h-0.5 bg-[#C02B0A]" />
+                    <div className="font-mono text-[10px] text-[#ef4444] tracking-[0.3em] uppercase mb-2 flex items-center gap-3">
+                        <div className="w-4 h-0.5 bg-[#ef4444]" />
                         Paper Management
                     </div>
                     <h1 className="text-4xl lg:text-5xl font-display font-black text-white tracking-tighter uppercase">
                         Papers
                     </h1>
                 </div>
-                <div className="font-mono text-[9px] text-[#97494E] tracking-widest uppercase">
+                <div className="font-mono text-[9px] text-[#94a3b8] tracking-widest uppercase">
                     {papers.length} Total
                 </div>
             </div>
 
             {/* Search */}
             <div className="relative">
-                <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#97494E]" />
+                <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#94a3b8]" />
                 <input
                     type="text"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     placeholder="Search papers..."
-                    className="w-full bg-black/40 border border-[#3C091E]/30 pl-10 pr-4 py-3 font-mono text-xs text-white tracking-wider focus:outline-none focus:border-[#C02B0A]/50 placeholder:text-[#3C091E]"
+                    className="w-full bg-white/5 border border-[#1e293b]/30 pl-10 pr-4 py-3 font-mono text-xs text-white tracking-wider focus:outline-none focus:border-[#ef4444]/50 placeholder:text-[#1e293b]"
                 />
             </div>
 
             {/* Table */}
-            <div className="bg-black/40 border border-[#3C091E]/30 overflow-hidden">
+            <div className="bg-white/5 border border-[#1e293b]/30 overflow-hidden">
                 {/* Table Header */}
-                <div className="grid grid-cols-12 gap-2 p-4 border-b border-[#3C091E]/30 font-mono text-[9px] text-[#97494E] tracking-[0.2em] uppercase">
+                <div className="grid grid-cols-12 gap-2 p-4 border-b border-[#1e293b]/30 font-mono text-[9px] text-[#94a3b8] tracking-[0.2em] uppercase">
                     <div className="col-span-4">Title</div>
                     <div className="col-span-2">Authors</div>
                     <div className="col-span-1">Year</div>
@@ -145,24 +145,24 @@ export default function PapersPage() {
 
                 {loading ? (
                     <div className="p-12 flex items-center justify-center">
-                        <div className="w-2 h-2 bg-[#C02B0A] animate-pulse rounded-full" />
+                        <div className="w-2 h-2 bg-[#ef4444] animate-pulse rounded-full" />
                     </div>
                 ) : filtered.length === 0 ? (
-                    <div className="p-12 text-center font-mono text-xs text-[#3C091E] tracking-widest uppercase">
+                    <div className="p-12 text-center font-mono text-xs text-[#1e293b] tracking-widest uppercase">
                         No papers found
                     </div>
                 ) : (
                     filtered.map((paper) => (
                         <div
                             key={paper.id}
-                            className="grid grid-cols-12 gap-2 p-4 border-b border-[#3C091E]/15 hover:bg-white/[0.01] transition-colors group items-center"
+                            className="grid grid-cols-12 gap-2 p-4 border-b border-[#1e293b]/15 hover:bg-white/[0.01] transition-colors group items-center"
                         >
                             <div className="col-span-4 font-mono text-xs text-white truncate">{paper.title}</div>
-                            <div className="col-span-2 font-mono text-[10px] text-[#97494E] truncate">
+                            <div className="col-span-2 font-mono text-[10px] text-[#94a3b8] truncate">
                                 {paper.authors.slice(0, 2).join(", ")}
                                 {paper.authors.length > 2 && "..."}
                             </div>
-                            <div className="col-span-1 font-mono text-[10px] text-[#97494E]">{paper.year || "—"}</div>
+                            <div className="col-span-1 font-mono text-[10px] text-[#94a3b8]">{paper.year || "—"}</div>
                             <div className="col-span-2">
                                 <span className={`inline-block px-2 py-0.5 font-mono text-[8px] tracking-[0.15em] uppercase border ${STATUS_COLORS[paper.status] || ""}`}>
                                     {paper.status}
@@ -172,21 +172,21 @@ export default function PapersPage() {
                                 <button
                                     onClick={() => handleReanalyze(paper.id)}
                                     title="Re-Analyze"
-                                    className="p-1.5 text-[#97494E] hover:text-[#C02B0A] hover:bg-[#C02B0A]/10 transition-colors"
+                                    className="p-1.5 text-[#94a3b8] hover:text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors"
                                 >
                                     <RefreshCw size={13} />
                                 </button>
                                 <button
                                     onClick={() => openEdit(paper)}
                                     title="Edit"
-                                    className="p-1.5 text-[#97494E] hover:text-[#C02B0A] hover:bg-[#C02B0A]/10 transition-colors"
+                                    className="p-1.5 text-[#94a3b8] hover:text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors"
                                 >
                                     <Pencil size={13} />
                                 </button>
                                 <button
                                     onClick={() => setDeleteId(paper.id)}
                                     title="Delete"
-                                    className="p-1.5 text-[#97494E] hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                                    className="p-1.5 text-[#94a3b8] hover:text-red-400 hover:bg-red-500/10 transition-colors"
                                 >
                                     <Trash2 size={13} />
                                 </button>
@@ -199,39 +199,39 @@ export default function PapersPage() {
             {/* Edit Modal */}
             {editingPaper && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px]" onClick={() => setEditingPaper(null)}>
-                    <div className="w-full max-w-md bg-[#050505] border border-[#3C091E]/30 p-6" onClick={e => e.stopPropagation()}>
+                    <div className="w-full max-w-md bg-[#0b0f19] border border-[#1e293b]/30 p-6" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="font-mono text-[10px] text-[#C02B0A] tracking-[0.3em] uppercase flex items-center gap-2">
-                                <div className="w-3 h-0.5 bg-[#C02B0A]" />
+                            <h3 className="font-mono text-[10px] text-[#ef4444] tracking-[0.3em] uppercase flex items-center gap-2">
+                                <div className="w-3 h-0.5 bg-[#ef4444]" />
                                 Edit Paper
                             </h3>
-                            <button onClick={() => setEditingPaper(null)} className="text-[#97494E] hover:text-[#C02B0A]">
+                            <button onClick={() => setEditingPaper(null)} className="text-[#94a3b8] hover:text-[#ef4444]">
                                 <X size={16} />
                             </button>
                         </div>
 
                         <div className="space-y-4">
                             <div>
-                                <label className="font-mono text-[9px] text-[#97494E] tracking-[0.2em] uppercase block mb-1">Title</label>
-                                <input value={editTitle} onChange={e => setEditTitle(e.target.value)} className="w-full bg-black/60 border border-[#3C091E]/50 px-3 py-2 font-mono text-xs text-white focus:outline-none focus:border-[#C02B0A]/50" />
+                                <label className="font-mono text-[9px] text-[#94a3b8] tracking-[0.2em] uppercase block mb-1">Title</label>
+                                <input value={editTitle} onChange={e => setEditTitle(e.target.value)} className="w-full bg-white/[0.06] border border-[#1e293b]/50 px-3 py-2 font-mono text-xs text-white focus:outline-none focus:border-[#ef4444]/50" />
                             </div>
                             <div>
-                                <label className="font-mono text-[9px] text-[#97494E] tracking-[0.2em] uppercase block mb-1">Authors (comma separated)</label>
-                                <input value={editAuthors} onChange={e => setEditAuthors(e.target.value)} className="w-full bg-black/60 border border-[#3C091E]/50 px-3 py-2 font-mono text-xs text-white focus:outline-none focus:border-[#C02B0A]/50" />
+                                <label className="font-mono text-[9px] text-[#94a3b8] tracking-[0.2em] uppercase block mb-1">Authors (comma separated)</label>
+                                <input value={editAuthors} onChange={e => setEditAuthors(e.target.value)} className="w-full bg-white/[0.06] border border-[#1e293b]/50 px-3 py-2 font-mono text-xs text-white focus:outline-none focus:border-[#ef4444]/50" />
                             </div>
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="font-mono text-[9px] text-[#97494E] tracking-[0.2em] uppercase block mb-1">Tags (comma separated)</label>
-                                    <input value={editTags} onChange={e => setEditTags(e.target.value)} className="w-full bg-black/60 border border-[#3C091E]/50 px-3 py-2 font-mono text-xs text-white focus:outline-none focus:border-[#C02B0A]/50" />
+                                    <label className="font-mono text-[9px] text-[#94a3b8] tracking-[0.2em] uppercase block mb-1">Tags (comma separated)</label>
+                                    <input value={editTags} onChange={e => setEditTags(e.target.value)} className="w-full bg-white/[0.06] border border-[#1e293b]/50 px-3 py-2 font-mono text-xs text-white focus:outline-none focus:border-[#ef4444]/50" />
                                 </div>
                                 <div>
-                                    <label className="font-mono text-[9px] text-[#97494E] tracking-[0.2em] uppercase block mb-1">Year</label>
-                                    <input value={editYear} onChange={e => setEditYear(e.target.value)} type="number" className="w-full bg-black/60 border border-[#3C091E]/50 px-3 py-2 font-mono text-xs text-white focus:outline-none focus:border-[#C02B0A]/50" />
+                                    <label className="font-mono text-[9px] text-[#94a3b8] tracking-[0.2em] uppercase block mb-1">Year</label>
+                                    <input value={editYear} onChange={e => setEditYear(e.target.value)} type="number" className="w-full bg-white/[0.06] border border-[#1e293b]/50 px-3 py-2 font-mono text-xs text-white focus:outline-none focus:border-[#ef4444]/50" />
                                 </div>
                             </div>
                         </div>
 
-                        <button onClick={handleEdit} className="mt-6 w-full py-2.5 bg-[#C02B0A] text-white font-mono text-[10px] tracking-[0.2em] uppercase hover:bg-[#C02B0A]/80 transition-colors">
+                        <button onClick={handleEdit} className="mt-6 w-full py-2.5 bg-[#ef4444] text-white font-mono text-[10px] tracking-[0.2em] uppercase hover:bg-[#ef4444]/80 transition-colors">
                             Save Changes
                         </button>
                     </div>
@@ -241,16 +241,16 @@ export default function PapersPage() {
             {/* Delete Confirmation Modal */}
             {deleteId && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-[2px]" onClick={() => setDeleteId(null)}>
-                    <div className="w-full max-w-sm bg-[#050505] border border-[#3C091E]/30 p-6" onClick={e => e.stopPropagation()}>
-                        <h3 className="font-mono text-[10px] text-[#C02B0A] tracking-[0.3em] uppercase mb-4 flex items-center gap-2">
-                            <div className="w-3 h-0.5 bg-[#C02B0A]" />
+                    <div className="w-full max-w-sm bg-[#0b0f19] border border-[#1e293b]/30 p-6" onClick={e => e.stopPropagation()}>
+                        <h3 className="font-mono text-[10px] text-[#ef4444] tracking-[0.3em] uppercase mb-4 flex items-center gap-2">
+                            <div className="w-3 h-0.5 bg-[#ef4444]" />
                             Confirm Delete
                         </h3>
-                        <p className="font-mono text-xs text-[#97494E] mb-6">
+                        <p className="font-mono text-xs text-[#94a3b8] mb-6">
                             This will permanently delete the paper and all associated vectors. This action cannot be undone.
                         </p>
                         <div className="flex gap-3">
-                            <button onClick={() => setDeleteId(null)} className="flex-1 py-2 border border-[#3C091E]/30 font-mono text-[10px] text-[#97494E] tracking-[0.2em] uppercase hover:border-[#97494E]/50 transition-colors">
+                            <button onClick={() => setDeleteId(null)} className="flex-1 py-2 border border-[#1e293b]/30 font-mono text-[10px] text-[#94a3b8] tracking-[0.2em] uppercase hover:border-[#94a3b8]/50 transition-colors">
                                 Cancel
                             </button>
                             <button onClick={handleDelete} className="flex-1 py-2 bg-red-600/80 text-white font-mono text-[10px] tracking-[0.2em] uppercase hover:bg-red-600 transition-colors">

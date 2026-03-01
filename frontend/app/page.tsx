@@ -22,9 +22,9 @@ export default function LandingPage() {
 
   // Color transitions based on the overall scroll progress of the viewport
   // 3D scene turns white around 40-75% scroll. We adjust DOM elements to contrast.
-  const isWhiteZone = progress > 0.4 && progress < 0.75;
-  const textColorClass = isWhiteZone ? "text-[#3C091E]" : "text-white";
-  const subtextColorClass = isWhiteZone ? "text-[#97494E]" : "text-white/60";
+  const isWhiteZone = false;
+  const textColorClass = "text-white";
+  const subtextColorClass = "text-[#94a3b8]";
 
   return (
     <main className="relative font-sans selection:bg-secondary/40 overflow-x-hidden">
@@ -47,19 +47,19 @@ export default function LandingPage() {
           }}
         >
           <div className="flex items-center gap-4 mb-6 opacity-80 font-mono tracking-[0.2em] text-[10px] md:text-sm uppercase font-bold text-white">
-            <div className="w-12 h-1 bg-[#C02B0A]" />
-            <span className="text-white tracking-widest bg-[#C02B0A] px-2 py-0.5">[ ARXION DATA INTELLIGENCE MODULE ]</span>
+            <div className="w-12 h-1 bg-[#ef4444]" />
+            <span className="text-white tracking-widest bg-[#ef4444] px-2 py-0.5">[ ARXION DATA INTELLIGENCE MODULE ]</span>
           </div>
 
           <h1 className="text-5xl md:text-[9vw] font-display font-black tracking-tighter leading-[0.85] uppercase text-white mb-10 w-full glitch" data-text="MAP THE TRUTH." style={{ wordSpacing: '-10px' }}>
-            MAP THE <span className="text-[#C02B0A]">TRUTH.</span><br />
-            FIND THE <span className="text-[#C02B0A] italic">GAPS.</span><br />
+            MAP THE <span className="text-[#ef4444]">TRUTH.</span><br />
+            FIND THE <span className="text-[#ef4444] italic">GAPS.</span><br />
           </h1>
 
           <div className="flex flex-col sm:flex-row items-center gap-6 pt-12 md:mr-32 border-t border-white/20 pointer-events-auto">
             <Button
               size="lg"
-              className="w-full sm:w-auto h-16 px-10 text-lg rounded-none bg-[#C02B0A] hover:bg-[#C02B0A]/90 clip-button text-white font-mono tracking-widest font-bold shadow-[0_0_40px_rgba(192,43,10,0.4)] transition-all"
+              className="w-full sm:w-auto h-16 px-10 text-lg rounded-none bg-[#ef4444] hover:bg-[#ef4444]/90 clip-button text-white font-mono tracking-widest font-bold shadow-[0_0_40px_rgba(239,68,68,0.4)] transition-all"
               asChild
             >
               <Link href="/dashboard">ACCESS SYSTEM</Link>
@@ -82,7 +82,7 @@ export default function LandingPage() {
               y: useTransform(scrollYProgress, [0.08, 0.16], [100, -100]),
             }}
           >
-            <div className="font-mono text-[9px] text-[#C02B0A] tracking-[0.4em] uppercase mb-4 border border-[#C02B0A]/30 bg-black/50 px-3 py-1 backdrop-blur inline-block w-max">
+            <div className="font-mono text-[9px] text-[#ef4444] tracking-[0.4em] uppercase mb-4 border border-[#ef4444]/30 bg-black/50 px-3 py-1 backdrop-blur inline-block w-max">
               CORE DEFINITION
             </div>
             <h3 className="text-3xl md:text-5xl font-cyber text-white uppercase tracking-widest max-w-3xl leading-snug">
@@ -98,7 +98,7 @@ export default function LandingPage() {
               y: useTransform(scrollYProgress, [0.15, 0.23], [100, -100]),
             }}
           >
-            <div className="font-mono text-[9px] text-[#C02B0A] tracking-[0.4em] uppercase mb-4 border border-[#C02B0A]/30 bg-black/50 px-3 py-1 backdrop-blur inline-block w-max">
+            <div className="font-mono text-[9px] text-[#ef4444] tracking-[0.4em] uppercase mb-4 border border-[#ef4444]/30 bg-black/50 px-3 py-1 backdrop-blur inline-block w-max">
               THE PROBLEM
             </div>
             <h3 className="text-3xl md:text-5xl font-cyberlight font-bold text-white uppercase tracking-widest max-w-4xl leading-snug">
@@ -114,7 +114,7 @@ export default function LandingPage() {
               y: useTransform(scrollYProgress, [0.22, 0.30], [100, -100]),
             }}
           >
-            <div className="font-mono text-[9px] text-[#C02B0A] tracking-[0.4em] uppercase mb-4 border border-[#C02B0A]/30 bg-black/50 px-3 py-1 backdrop-blur inline-block w-max">
+            <div className="font-mono text-[9px] text-[#ef4444] tracking-[0.4em] uppercase mb-4 border border-[#ef4444]/30 bg-black/50 px-3 py-1 backdrop-blur inline-block w-max">
               THE OBJECTIVE
             </div>
             <h3 className="text-3xl md:text-5xl font-cyber text-white uppercase tracking-widest max-w-3xl leading-snug">
@@ -132,14 +132,14 @@ export default function LandingPage() {
           }}
         >
           <div className="flex items-center gap-4 mb-6 font-mono tracking-[0.2em] text-sm uppercase font-bold">
-            <span className="bg-[#C02B0A] text-white px-3 py-1 border border-[#C02B0A]/20 tracking-widest text-[10px]">SYSTEM INFRASTRUCTURE</span>
+            <span className="bg-[#ef4444] text-white px-3 py-1 border border-[#ef4444]/20 tracking-widest text-[10px]">SYSTEM INFRASTRUCTURE</span>
             <div className={`w-12 h-0.5 bg-current opacity-30`} />
           </div>
 
           <h2 className="text-6xl md:text-[8vw] font-display font-black tracking-tighter leading-none uppercase text-white" style={{ wordSpacing: '-5px' }}>
             AUTONOMOUS<br />
-            <span className="flex items-center text-[#97494E]">
-              <span className="w-16 h-1 bg-[#3C091E] mr-6" />
+            <span className="flex items-center text-[#94a3b8]">
+              <span className="w-16 h-1 bg-[#1e293b] mr-6" />
               CAPABILITIES
             </span>
           </h2>
@@ -167,64 +167,66 @@ export default function LandingPage() {
         >
           <h2 className="text-5xl md:text-[8vw] font-display font-black uppercase leading-[0.8] tracking-tighter mb-6 glitch" data-text="STOP SKIMMING.">
             STOP SKIMMING.<br />
-            <span className="text-[#97494E]">START OVERRIDING.</span>
+            <span className="text-[#94a3b8]">START OVERRIDING.</span>
           </h2>
         </motion.div>
 
       </div>
 
       {/* SECTION 6: THE WHITE CARDS GAP FINDER / USE CASES (Static rendering before footer) */}
-      <div className="relative w-full bg-[#f0f0f0] z-20 pointer-events-auto py-32 border-b border-[#3C091E]/20">
+      <div className="relative w-full bg-gradient-to-br from-[#0b0f19] via-[#0d111c] to-[#111827] z-20 pointer-events-auto py-32 border-b border-[#1e293b]/20">
+        <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(239,68,68,0.08), transparent 60%)', opacity: 0.1 }} />
         <Features />
       </div>
 
       {/* SECTION 7: THE MASSIVE FOOTER BLOCK (Static end of document) */}
-      <footer className="relative bg-[#050505] min-h-screen z-20 overflow-hidden flex flex-col justify-end pb-0">
+      <footer className="relative bg-[#0b0f19] min-h-screen z-20 overflow-hidden flex flex-col justify-end pb-0">
         {/* Background massive glitch text */}
-        <div className="absolute top-10 left-0 w-full overflow-hidden Mix-blend-overlay opacity-30 pointer-events-none flex justify-center mt-20">
-          <h1 className="text-[25vw] font-display font-black tracking-tighter leading-none text-[#3C091E]">
+        <div className="absolute top-10 left-0 w-full overflow-hidden Mix-blend-overlay opacity-5 pointer-events-none flex justify-center mt-20">
+          <h1 className="text-[25vw] font-display font-black tracking-tighter leading-none text-white">
             ARXION
           </h1>
         </div>
 
         {/* The white clipped footer foreground block */}
-        <div className="relative w-full bg-[#f0f0f0] mt-[30vh] clip-footer px-6 md:px-24 py-32 flex flex-col lg:flex-row justify-between gap-16 pointer-events-auto">
+        <div className="relative w-full bg-gradient-to-br from-[#0b0f19] via-[#0d111c] to-[#111827] mt-[30vh] clip-footer px-6 md:px-24 py-32 flex flex-col lg:flex-row justify-between gap-16 pointer-events-auto">
+          <div className="absolute inset-0 pointer-events-none" style={{ backgroundImage: 'radial-gradient(circle at center, rgba(239,68,68,0.08), transparent 60%)', opacity: 0.1 }} />
 
           <div className="lg:w-1/3">
-            <div className="flex items-center gap-3 font-mono text-sm tracking-widest font-bold text-[#3C091E] mb-6 border border-[#3C091E] px-4 py-2 w-max">
-              <span className="w-2 h-2 bg-[#C02B0A]" />
+            <div className="flex items-center gap-3 font-mono text-sm tracking-widest font-bold text-white mb-6 border border-white/10 p-4 w-max rounded-xl bg-white/5 backdrop-blur-sm shadow-[0_0_30px_rgba(239,68,68,0.05)]">
+              <span className="w-2 h-2 bg-[#ef4444] rounded-full" />
               ARXION ENGINE
             </div>
-            <p className="font-mono text-sm text-[#97494E] leading-loose max-w-sm mb-12">
+            <p className="font-mono text-sm text-[#94a3b8] leading-loose max-w-sm mb-12">
               People don't just read PDFs anymore. They extract structures, find gaps, and map the contradictions. Welcome to autonomous analysis.
             </p>
             <div className="flex gap-4">
-              <div className="w-10 h-10 bg-[#3C091E] flex items-center justify-center text-white hover:bg-[#C02B0A] transition-colors cursor-pointer clip-button font-mono font-bold">X</div>
-              <div className="w-10 h-10 bg-[#3C091E] flex items-center justify-center text-white hover:bg-[#C02B0A] transition-colors cursor-pointer clip-button font-mono font-bold">G</div>
+              <div className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-[#94a3b8] hover:bg-white/10 hover:text-white transition-colors cursor-pointer font-mono font-bold">X</div>
+              <div className="w-10 h-10 bg-white/5 border border-white/10 rounded-xl flex items-center justify-center text-[#94a3b8] hover:bg-white/10 hover:text-white transition-colors cursor-pointer font-mono font-bold">G</div>
             </div>
           </div>
 
-          <div className="lg:w-1/4">
-            <h4 className="font-mono text-lg font-bold tracking-widest text-[#3C091E] mb-8">EXPLORE</h4>
-            <ul className="space-y-4 font-mono text-sm text-[#97494E] uppercase tracking-wide">
-              <li className="hover:text-[#C02B0A] cursor-pointer transition-colors block">About Matrix</li>
-              <li className="hover:text-[#C02B0A] cursor-pointer transition-colors block border-t border-[#3C091E]/10 pt-4">How it works</li>
-              <li className="hover:text-[#C02B0A] cursor-pointer transition-colors block border-t border-[#3C091E]/10 pt-4">System Logic</li>
-              <li className="hover:text-[#C02B0A] cursor-pointer transition-colors block border-t border-[#3C091E]/10 pt-4">Data Extraction</li>
+          <div className="lg:w-1/4 z-10">
+            <h4 className="font-mono text-lg font-bold tracking-widest text-[#94a3b8] mb-8">EXPLORE</h4>
+            <ul className="space-y-4 font-mono text-sm text-[#94a3b8] uppercase tracking-wide">
+              <li className="hover:text-[#ef4444] cursor-pointer transition-colors block">About Matrix</li>
+              <li className="hover:text-white cursor-pointer transition-colors block border-t border-white/10 pt-4">How it works</li>
+              <li className="hover:text-white cursor-pointer transition-colors block border-t border-white/10 pt-4">System Logic</li>
+              <li className="hover:text-white cursor-pointer transition-colors block border-t border-white/10 pt-4">Data Extraction</li>
             </ul>
           </div>
 
-          <div className="lg:w-1/3">
-            <h4 className="font-mono text-lg font-bold tracking-widest text-[#3C091E] mb-8">GET STARTED</h4>
+          <div className="lg:w-1/3 z-10">
+            <h4 className="font-mono text-lg font-bold tracking-widest text-[#94a3b8] mb-8">GET STARTED</h4>
             <div className="space-y-6">
               <div className="flex gap-4">
-                <input className="w-1/2 bg-transparent border-b border-[#3C091E]/30 focus:border-[#C02B0A] outline-none py-2 font-mono text-xs placeholder-[#97494E]" placeholder="First name *" />
-                <input className="w-1/2 bg-transparent border-b border-[#3C091E]/30 focus:border-[#C02B0A] outline-none py-2 font-mono text-xs placeholder-[#97494E]" placeholder="Last name *" />
+                <input className="w-1/2 bg-transparent border-b border-white/10 focus:border-[#ef4444] text-white outline-none py-2 font-mono text-xs placeholder-[#94a3b8]" placeholder="First name *" />
+                <input className="w-1/2 bg-transparent border-b border-white/10 focus:border-[#ef4444] text-white outline-none py-2 font-mono text-xs placeholder-[#94a3b8]" placeholder="Last name *" />
               </div>
-              <input className="w-full bg-transparent border-b border-[#3C091E]/30 focus:border-[#C02B0A] outline-none py-2 font-mono text-xs placeholder-[#97494E]" placeholder="Email *" />
+              <input className="w-full bg-transparent border-b border-white/10 focus:border-[#ef4444] text-white outline-none py-2 font-mono text-xs placeholder-[#94a3b8]" placeholder="Email *" />
               <Button
                 size="lg"
-                className="mt-8 px-10 rounded-none bg-[#3C091E] hover:bg-[#C02B0A] clip-button text-white font-mono tracking-widest font-bold transition-all w-max"
+                className="mt-8 px-10 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-mono tracking-widest font-bold transition-all w-max shadow-[0_0_30px_rgba(239,68,68,0.05)]"
                 asChild
               >
                 <Link href="/dashboard">SUBMIT</Link>

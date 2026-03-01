@@ -34,7 +34,7 @@ function RedBadges() {
                     <mesh position={new THREE.Vector3(...b.pos)} scale={new THREE.Vector3(b.scale, b.scale, b.scale)}>
                         {/* Beveled Box / Coin */}
                         <boxGeometry args={[1.5, 1.5, 0.2]} />
-                        <meshStandardMaterial color="#C02B0A" metalness={0.6} roughness={0.3} />
+                        <meshStandardMaterial color="#ef4444" metalness={0.6} roughness={0.3} />
                         {/* Add a generic tech icon shape inside the red coin */}
                         <mesh position={[0, 0, 0.12]}>
                             <torusGeometry args={[0.4, 0.05, 16, 32]} />
@@ -96,7 +96,7 @@ function FeatureGraph() {
         <group>
             {/* Draw network lines between nodes */}
             {edges.map((e, i) => (
-                <Line key={`e-${i}`} points={[new THREE.Vector3(...e[0]), new THREE.Vector3(...e[1])]} color="#C02B0A" lineWidth={1.5} opacity={graphActive ? 0.4 : 0} transparent />
+                <Line key={`e-${i}`} points={[new THREE.Vector3(...e[0]), new THREE.Vector3(...e[1])]} color="#ef4444" lineWidth={1.5} opacity={graphActive ? 0.4 : 0} transparent />
             ))}
 
             {/* Render Nodes as pure HTML tooltips floating in space */}
@@ -106,17 +106,17 @@ function FeatureGraph() {
                         <div className={`transition-all duration-1000 ${graphActive ? 'opacity-100 scale-100' : 'opacity-0 scale-50 pointer-events-none'} relative group`}>
 
                             {/* The glowing dot anchor */}
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#C02B0A] blur-[4px] group-hover:scale-150 transition-transform" />
+                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-[#ef4444] blur-[8px] group-hover:scale-150 transition-transform shadow-[0_0_20px_rgba(239,68,68,0.6)]" />
                             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-white" />
 
                             {/* Connecting dash to card */}
-                            <div className="absolute top-1/2 left-1/2 w-8 h-[1px] bg-[#C02B0A]" />
+                            <div className="absolute top-1/2 left-1/2 w-8 h-[1px] bg-[#ef4444]/30 shadow-[0_0_5px_rgba(239,68,68,0.3)]" />
 
-                            <div className="absolute top-1/2 left-[calc(50%+32px)] -translate-y-1/2 border border-[#C02B0A]/30 bg-black/80 backdrop-blur p-4 min-w-[220px] max-w-[280px] clip-card hover:border-[#C02B0A] transition-colors pointer-events-auto cursor-pointer">
-                                <div className={`flex items-center gap-2 mb-2 font-mono uppercase text-[10px] tracking-widest text-[#C02B0A] group-hover:text-white transition-colors`}>
+                            <div className="absolute top-1/2 left-[calc(50%+32px)] -translate-y-1/2 border border-white/10 bg-white/5 backdrop-blur-sm p-4 min-w-[220px] max-w-[280px] rounded-xl shadow-[0_0_30px_rgba(239,68,68,0.05)] hover:border-[#ef4444]/40 transition-colors pointer-events-auto cursor-pointer">
+                                <div className={`flex items-center gap-2 mb-2 font-mono uppercase text-[10px] tracking-widest text-white transition-colors`}>
                                     {feat.title}
                                 </div>
-                                <p className="text-white text-[9px] font-mono opacity-80 leading-relaxed uppercase">
+                                <p className="text-[#94a3b8] text-[9px] font-mono leading-relaxed uppercase">
                                     {feat.desc}
                                 </p>
                             </div>
@@ -134,18 +134,18 @@ function SceneController() {
     const { scene } = useThree();
 
     useFrame(() => {
-        const startColor = new THREE.Color("#1A030A");
-        const midColor = new THREE.Color("#3C091E");
-        const endColor = new THREE.Color("#F0F0F0");
+        const startColor = new THREE.Color("#0b0f19");
+        const midColor = new THREE.Color("#0d111c");
+        const endColor = new THREE.Color("#111827");
 
         let currentColor;
 
         if (progress < 0.2) {
             currentColor = startColor.lerp(midColor, progress / 0.2);
         } else if (progress < 0.45) {
-            currentColor = midColor.lerp(endColor, (progress - 0.2) / 0.25); // Turns white around progress 0.45
+            currentColor = midColor.lerp(endColor, (progress - 0.2) / 0.25);
         } else {
-            currentColor = endColor; // Stays white for the rest
+            currentColor = endColor;
         }
 
         scene.background = currentColor;
@@ -194,7 +194,7 @@ export default function Hero3D() {
                     angle={0.4}
                     penumbra={1}
                     intensity={5}
-                    color="#C02B0A"
+                    color="#ef4444"
                     distance={50}
                 />
 
@@ -212,10 +212,10 @@ export default function Hero3D() {
                     args={[200, 400]}
                     cellSize={2}
                     cellThickness={progress > 0.4 ? 1 : 0.5}
-                    cellColor={progress > 0.4 ? "#cccccc" : "#601020"}
+                    cellColor={progress > 0.4 ? "#cccccc" : "#0f172a"}
                     sectionSize={10}
                     sectionThickness={progress > 0.4 ? 2 : 1}
-                    sectionColor={progress > 0.4 ? "#999999" : "#C02B0A"}
+                    sectionColor={progress > 0.4 ? "#999999" : "#ef4444"}
                     fadeDistance={60}
                     fadeStrength={1}
                 />

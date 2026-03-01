@@ -10,7 +10,7 @@ export function Navbar() {
     const isLanding = pathname === "/";
 
     return (
-        <header className="fixed top-0 w-full z-50 bg-black/40 backdrop-blur-md border-b-[0.5px] border-white/10 font-mono tracking-widest text-[11px] uppercase">
+        <header className="fixed top-0 w-full z-50 bg-white/5 backdrop-blur-md border-b-[0.5px] border-white/10 font-mono tracking-widest text-[11px] uppercase">
             <div className="container mx-auto px-6 h-14 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <Link href="/" className="font-bold flex items-center gap-3">
@@ -51,10 +51,10 @@ export function Navbar() {
                                 elements: {
                                     userButtonTrigger: "rounded-full focus:shadow-none focus:outline-none",
                                     userButtonBox: "w-8 h-8",
-                                    avatarBox: "!rounded-full w-8 h-8 border border-[#3C091E]/40 hover:brightness-125 transition-all duration-200 cursor-pointer",
+                                    avatarBox: "!rounded-full w-8 h-8 border border-[#1e293b]/40 hover:brightness-125 transition-all duration-200 cursor-pointer",
                                     avatarImage: "!rounded-full",
-                                    userButtonPopoverCard: "bg-[#0a0a0a] border border-[#3C091E]/40 rounded-none",
-                                    userButtonPopoverActionButton: "hover:bg-[#C02B0A]/10 rounded-none",
+                                    userButtonPopoverCard: "bg-[#0d111c] border border-[#1e293b]/40 rounded-none",
+                                    userButtonPopoverActionButton: "hover:bg-[#ef4444]/10 rounded-none",
                                     userButtonPopoverActionButtonText: "text-white font-mono text-xs tracking-widest",
                                     userButtonPopoverFooter: "hidden",
                                 },
@@ -64,7 +64,7 @@ export function Navbar() {
 
                     <Button
                         asChild
-                        className="bg-secondary hover:bg-secondary/90 text-white clip-button h-8 rounded-none px-6 shadow-[0_0_15px_rgba(192,43,10,0.5)] transition-all font-mono"
+                        className="bg-secondary hover:bg-secondary/90 text-white clip-button h-8 rounded-none px-6 shadow-[0_0_15px_rgba(239,68,68,0.5)] transition-all font-mono"
                     >
                         <Link href="/dashboard">ACCESS ENGINE</Link>
                     </Button>

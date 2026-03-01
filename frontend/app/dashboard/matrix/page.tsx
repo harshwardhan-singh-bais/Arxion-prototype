@@ -39,10 +39,10 @@ export default function LitMatrixPage() {
         <div className="h-full w-full flex flex-col gap-8 max-w-[1400px] mx-auto">
 
             {/* Top Header */}
-            <div className="flex justify-between items-end border-b border-[#3C091E]/30 pb-6">
+            <div className="flex justify-between items-end border-b border-[#1e293b]/30 pb-6">
                 <div>
-                    <div className="font-mono text-[10px] text-[#C02B0A] tracking-[0.3em] uppercase mb-2 flex items-center gap-3">
-                        <div className="w-4 h-0.5 bg-[#C02B0A]" />
+                    <div className="font-mono text-[10px] text-[#ef4444] tracking-[0.3em] uppercase mb-2 flex items-center gap-3">
+                        <div className="w-4 h-0.5 bg-[#ef4444]" />
                         C. Multi-Paper Intelligence
                     </div>
                     <h1 className="text-4xl font-display font-black tracking-tighter text-white uppercase glitch" data-text="LITERATURE MATRIX">
@@ -50,55 +50,55 @@ export default function LitMatrixPage() {
                     </h1>
                 </div>
                 <div className="flex gap-4">
-                    <button className="flex items-center gap-2 border border-[#3C091E]/50 px-4 py-2 font-mono text-[10px] tracking-widest uppercase hover:bg-[#C02B0A]/10 hover:text-[#C02B0A] transition-colors text-white">
+                    <button className="flex items-center gap-2 border border-[#1e293b]/50 px-4 py-2 font-mono text-[10px] tracking-widest uppercase hover:bg-[#ef4444]/10 hover:text-[#ef4444] transition-colors text-white">
                         <Filter size={14} /> Compare Tags
                     </button>
-                    <button className="flex items-center gap-2 border border-[#3C091E]/50 px-4 py-2 font-mono text-[10px] tracking-widest uppercase bg-[#3C091E] text-white hover:bg-[#C02B0A] transition-colors clip-button">
+                    <button className="flex items-center gap-2 border border-[#1e293b]/50 px-4 py-2 font-mono text-[10px] tracking-widest uppercase bg-[#1e293b] text-white hover:bg-[#ef4444] transition-colors clip-button">
                         Export Matrix CSV
                     </button>
                 </div>
             </div>
 
             {/* Main Matrix Table */}
-            <div className="w-full overflow-x-auto bg-[#050505] border border-[#3C091E]/30 clip-card">
+            <div className="w-full overflow-x-auto bg-[#0b0f19] border border-[#1e293b]/30 clip-card">
                 <table className="w-full text-left border-collapse">
                     <thead>
-                        <tr className="border-b border-[#3C091E]/30 bg-[#1A030A]">
-                            <th className="p-4 font-mono text-[10px] tracking-widest text-[#97494E] uppercase">ID</th>
-                            <th className="p-4 font-mono text-[10px] tracking-widest text-[#97494E] uppercase">Paper Title</th>
-                            <th className="p-4 font-mono text-[10px] tracking-widest text-[#97494E] uppercase">Arxion RCI</th>
-                            <th className="p-4 font-mono text-[10px] tracking-widest text-[#97494E] uppercase">Datasets Scanned</th>
-                            <th className="p-4 font-mono text-[10px] tracking-widest text-[#97494E] uppercase">Core Method</th>
-                            <th className="p-4 font-mono text-[10px] tracking-widest text-[#97494E] uppercase">Verification Status</th>
+                        <tr className="border-b border-[#1e293b]/30 bg-[#0f172a]">
+                            <th className="p-4 font-mono text-[10px] tracking-widest text-[#94a3b8] uppercase">ID</th>
+                            <th className="p-4 font-mono text-[10px] tracking-widest text-[#94a3b8] uppercase">Paper Title</th>
+                            <th className="p-4 font-mono text-[10px] tracking-widest text-[#94a3b8] uppercase">Arxion RCI</th>
+                            <th className="p-4 font-mono text-[10px] tracking-widest text-[#94a3b8] uppercase">Datasets Scanned</th>
+                            <th className="p-4 font-mono text-[10px] tracking-widest text-[#94a3b8] uppercase">Core Method</th>
+                            <th className="p-4 font-mono text-[10px] tracking-widest text-[#94a3b8] uppercase">Verification Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         {isLoading ? (
                             <tr>
-                                <td colSpan={6} className="p-8 text-center font-mono text-xs text-[#97494E] uppercase">
+                                <td colSpan={6} className="p-8 text-center font-mono text-xs text-[#94a3b8] uppercase">
                                     INITIALIZING MATRIX LINK...
                                 </td>
                             </tr>
                         ) : papers.length === 0 ? (
                             <tr>
-                                <td colSpan={6} className="p-8 text-center font-mono text-xs text-[#97494E] uppercase">
+                                <td colSpan={6} className="p-8 text-center font-mono text-xs text-[#94a3b8] uppercase">
                                     NO VECTORS FOUND. INGEST LITERATURE TO POPULATE.
                                 </td>
                             </tr>
                         ) : papers.map((paper, i) => (
-                            <tr key={paper.id} onClick={() => router.push(`/dashboard/paper/${paper.id}`)} className="border-b border-[#3C091E]/10 hover:bg-white/[0.02] cursor-pointer transition-colors group">
+                            <tr key={paper.id} onClick={() => router.push(`/dashboard/paper/${paper.id}`)} className="border-b border-[#1e293b]/10 hover:bg-white/[0.02] cursor-pointer transition-colors group">
 
-                                <td className="p-4 font-mono text-xs text-[#C02B0A] group-hover:underline truncate max-w-[100px]">{paper.id}</td>
+                                <td className="p-4 font-mono text-xs text-[#ef4444] group-hover:underline truncate max-w-[100px]">{paper.id}</td>
 
                                 <td className="p-4 max-w-sm">
-                                    <h4 className="font-sans text-sm font-bold text-white mb-1 group-hover:text-[#C02B0A] transition-colors line-clamp-1">{paper.title}</h4>
-                                    <span className="font-mono text-[9px] text-[#97494E] uppercase truncate block">{paper.authors}</span>
+                                    <h4 className="font-sans text-sm font-bold text-white mb-1 group-hover:text-[#ef4444] transition-colors line-clamp-1">{paper.title}</h4>
+                                    <span className="font-mono text-[9px] text-[#94a3b8] uppercase truncate block">{paper.authors}</span>
                                 </td>
 
                                 <td className="p-4">
                                     <div className="flex items-center gap-3">
                                         <div className="w-16 h-1 bg-black overflow-hidden relative">
-                                            <div className={`h-full absolute left-0 ${paper.rci > 90 ? 'bg-green-500' : paper.rci > 80 ? 'bg-yellow-500' : 'bg-[#C02B0A]'}`} style={{ width: `${paper.rci}%` }} />
+                                            <div className={`h-full absolute left-0 ${paper.rci > 90 ? 'bg-green-500' : paper.rci > 80 ? 'bg-yellow-500' : 'bg-[#ef4444]'}`} style={{ width: `${paper.rci}%` }} />
                                         </div>
                                         <span className="font-mono text-xs text-white">{paper.rci}</span>
                                     </div>
@@ -106,13 +106,13 @@ export default function LitMatrixPage() {
 
                                 <td className="p-4 max-w-[200px]">
                                     <div className="flex gap-2 flex-wrap">
-                                        {paper.datasets.length === 0 && <span className="text-[9px] font-mono text-[#3C091E]">NONE</span>}
+                                        {paper.datasets.length === 0 && <span className="text-[9px] font-mono text-[#1e293b]">NONE</span>}
                                         {paper.datasets.slice(0, 2).map((d: string) => (
-                                            <span key={d} className="px-2 py-0.5 border border-[#3C091E]/50 text-[9px] font-mono uppercase text-[#97494E] bg-black truncate max-w-[80px]">
+                                            <span key={d} className="px-2 py-0.5 border border-[#1e293b]/50 text-[9px] font-mono uppercase text-[#94a3b8] bg-black truncate max-w-[80px]">
                                                 {d}
                                             </span>
                                         ))}
-                                        {paper.datasets.length > 2 && <span className="text-[9px] font-mono text-[#97494E] p-1">+{paper.datasets.length - 2}</span>}
+                                        {paper.datasets.length > 2 && <span className="text-[9px] font-mono text-[#94a3b8] p-1">+{paper.datasets.length - 2}</span>}
                                     </div>
                                 </td>
 
@@ -120,12 +120,12 @@ export default function LitMatrixPage() {
 
                                 <td className="p-4">
                                     {paper.status === "VERIFIED" && <span className="flex items-center gap-2 text-[10px] font-mono text-green-500 uppercase"><CheckCircle2 size={12} /> Verified</span>}
-                                    {paper.status === "PROCESSING" && <span className="flex items-center gap-2 text-[10px] font-mono text-[#C02B0A] uppercase animate-pulse">Processing</span>}
+                                    {paper.status === "PROCESSING" && <span className="flex items-center gap-2 text-[10px] font-mono text-[#ef4444] uppercase animate-pulse">Processing</span>}
                                     {paper.status === "BASELINE" && <span className="flex items-center gap-2 text-[10px] font-mono text-blue-500 uppercase"><LinkIcon size={12} /> Root Baseline</span>}
                                     {paper.status === "CONTRADICTION" && (
                                         <div className="flex flex-col gap-1">
-                                            <span className="flex items-center gap-2 text-[10px] font-mono text-[#C02B0A] uppercase"><AlertOctagon size={12} /> Contradiction</span>
-                                            <span className="text-[8px] text-[#97494E] font-mono uppercase truncate max-w-[150px]">{paper.flag}</span>
+                                            <span className="flex items-center gap-2 text-[10px] font-mono text-[#ef4444] uppercase"><AlertOctagon size={12} /> Contradiction</span>
+                                            <span className="text-[8px] text-[#94a3b8] font-mono uppercase truncate max-w-[150px]">{paper.flag}</span>
                                         </div>
                                     )}
                                 </td>

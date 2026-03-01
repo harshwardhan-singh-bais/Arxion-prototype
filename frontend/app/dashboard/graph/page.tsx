@@ -29,13 +29,13 @@ function NetworkNodes({ nodes }: { nodes: any[] }) {
                     {/* Solais Tooltip */}
                     {hovered === n.id && (
                         <Html distanceFactor={20} zIndexRange={[100, 0]} className="pointer-events-none">
-                            <div className="border border-[#C02B0A]/50 bg-black/90 p-3 min-w-[120px] transition-all clip-card text-left">
-                                <div className="font-mono text-[8px] text-[#C02B0A] tracking-widest uppercase mb-1 flex items-center gap-2">
+                            <div className="border border-[#ef4444]/50 bg-black/90 p-3 min-w-[120px] transition-all clip-card text-left">
+                                <div className="font-mono text-[8px] text-[#ef4444] tracking-widest uppercase mb-1 flex items-center gap-2">
                                     {n.type === 0 ? <FileText size={10} /> : n.type === 1 ? <Database size={10} /> : <Settings2 size={10} />}
                                     {n.type === 0 ? "PAPER" : n.type === 1 ? "DATASET" : "METHOD"}
                                 </div>
                                 <div className="font-cyber font-bold text-xs text-white uppercase">{n.label}</div>
-                                {n.type === 0 && <div className="text-[7px] text-[#97494E] font-mono mt-1 uppercase">RCI: {(Math.random() * 40 + 60).toFixed(1)}%</div>}
+                                {n.type === 0 && <div className="text-[7px] text-[#94a3b8] font-mono mt-1 uppercase">RCI: {(Math.random() * 40 + 60).toFixed(1)}%</div>}
                             </div>
                         </Html>
                     )}
@@ -83,7 +83,7 @@ export default function NeuralGraphPage() {
                             type,
                             pos: [(Math.random() - 0.5) * 40, (Math.random() - 0.5) * 40, (Math.random() - 0.5) * 40],
                             size: type === 0 ? 0.4 : type === 1 ? 0.9 : 0.7,
-                            color: type === 0 ? "#ffffff" : type === 1 ? "#C02B0A" : "#3C091E",
+                            color: type === 0 ? "#ffffff" : type === 1 ? "#ef4444" : "#1e293b",
                             label
                         };
                         nodeMap.set(id, n);
@@ -98,14 +98,14 @@ export default function NeuralGraphPage() {
                     if (p.datasets) {
                         p.datasets.forEach((d: any) => {
                             const dsNode = addNode(`ds_${d.name}`, 1, d.name);
-                            edges.push([paperNode.pos, dsNode.pos, "#C02B0A"]);
+                            edges.push([paperNode.pos, dsNode.pos, "#ef4444"]);
                         });
                     }
 
                     if (p.methods) {
                         p.methods.forEach((m: any) => {
                             const mNode = addNode(`m_${m.name}`, 2, m.name);
-                            edges.push([paperNode.pos, mNode.pos, "#3C091E"]);
+                            edges.push([paperNode.pos, mNode.pos, "#1e293b"]);
                         });
                     }
                 });
@@ -125,8 +125,8 @@ export default function NeuralGraphPage() {
             <div className="absolute top-0 left-0 w-full z-10 pointer-events-none p-6">
                 <div className="flex justify-between items-start">
                     <div>
-                        <div className="font-mono text-[10px] text-[#C02B0A] tracking-[0.3em] uppercase mb-2 flex items-center gap-3">
-                            <div className="w-4 h-0.5 bg-[#C02B0A]" />
+                        <div className="font-mono text-[10px] text-[#ef4444] tracking-[0.3em] uppercase mb-2 flex items-center gap-3">
+                            <div className="w-4 h-0.5 bg-[#ef4444]" />
                             C. Multi-Paper Intelligence
                         </div>
                         <h1 className="text-4xl font-display font-black tracking-tighter text-white uppercase glitch" data-text="3D KNOWLEDGE GRAPH">
@@ -135,11 +135,11 @@ export default function NeuralGraphPage() {
                     </div>
 
                     {/* Legend */}
-                    <div className="bg-[#050505] border border-[#3C091E]/30 p-4 shrink-0 flex flex-col gap-2 clip-card-solais">
-                        <h4 className="font-mono text-[9px] text-[#97494E] tracking-widest uppercase border-b border-[#3C091E]/30 pb-2 mb-2">Entity Legend</h4>
+                    <div className="bg-[#0b0f19] border border-[#1e293b]/30 p-4 shrink-0 flex flex-col gap-2 clip-card-solais">
+                        <h4 className="font-mono text-[9px] text-[#94a3b8] tracking-widest uppercase border-b border-[#1e293b]/30 pb-2 mb-2">Entity Legend</h4>
                         <div className="flex items-center gap-3 font-mono text-[10px] text-white uppercase"><div className="w-2 h-2 bg-white rounded-full" /> Extracted Paper</div>
-                        <div className="flex items-center gap-3 font-mono text-[10px] text-white uppercase"><div className="w-2 h-2 bg-[#C02B0A] rounded-full" /> Saturated Dataset</div>
-                        <div className="flex items-center gap-3 font-mono text-[10px] text-white uppercase"><div className="w-2 h-2 bg-[#3C091E] rounded-full" /> Core Methodology</div>
+                        <div className="flex items-center gap-3 font-mono text-[10px] text-white uppercase"><div className="w-2 h-2 bg-[#ef4444] rounded-full" /> Saturated Dataset</div>
+                        <div className="flex items-center gap-3 font-mono text-[10px] text-white uppercase"><div className="w-2 h-2 bg-[#1e293b] rounded-full" /> Core Methodology</div>
                     </div>
                 </div>
             </div>
@@ -147,8 +147,8 @@ export default function NeuralGraphPage() {
             {/* 3D Canvas Fill */}
             <div className="absolute inset-0 z-0 bg-transparent">
                 <Canvas camera={{ position: [0, 0, 40], fov: 45 }}>
-                    <color attach="background" args={["#050505"]} />
-                    <fog attach="fog" args={["#050505", 20, 80]} />
+                    <color attach="background" args={["#0b0f19"]} />
+                    <fog attach="fog" args={["#0b0f19", 20, 80]} />
                     <ambientLight intensity={0.5} />
 
                     <NetworkNodes nodes={graphData.nodes} />

@@ -6,40 +6,36 @@
 
 @layer base {
   :root {
-    --background: 240 10% 4%;
+    --background: 222 47% 7%;
     --foreground: 210 40% 98%;
 
-    --card: 240 10% 6%;
+    --card: 222 47% 9%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 240 10% 6%;
+    --popover: 222 47% 9%;
     --popover-foreground: 210 40% 98%;
 
     /* Solais Colors */
-    --primary: 345 80% 40%;
-    /* Rich Burgundy/Red (3C091E but brighter for UI) */
+    --primary: 0 84% 60%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 12 90% 40%;
-    /* Vibrant Orange-Red (C02B0A) */
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 240 10% 12%;
+    --muted: 222 47% 14%;
     --muted-foreground: 240 5% 65%;
 
-    --accent: 345 80% 25%;
-    /* Deep Wine */
+    --accent: 0 84% 45%;
     --accent-foreground: 210 40% 98%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
-    --ring: 345 80% 40%;
+    --border: 215 20% 16%;
+    --input: 215 20% 16%;
+    --ring: 0 84% 60%;
 
     --radius: 0;
-    /* Brutalist = sharp corners */
   }
 }
 
@@ -50,7 +46,8 @@
 
   body {
     @apply bg-background text-foreground font-sans;
-    background-color: #050505;
+    background-color: #0b0f19;
+    background: linear-gradient(to bottom right, #0b0f19, #0d111c);
   }
 
   /* The Grain Effect */
@@ -65,23 +62,23 @@
     mix-blend-mode: overlay;
   }
 
-  /* Electric Blue Vignette */
+  /* Electric Red Radial Glow */
   body::after {
     content: "";
     position: fixed;
     inset: 0;
     z-index: -10;
     pointer-events: none;
-    background: radial-gradient(circle at center, transparent 30%, rgba(0, 50, 200, 0.05) 80%, rgba(0, 100, 255, 0.1) 100%);
+    background: radial-gradient(circle at center, rgba(239, 68, 68, 0.10) 0%, transparent 80%);
   }
 
   /* Brutalist Glass/Card */
   .glass {
-    @apply bg-black/60 backdrop-blur-md border border-white/10;
+    @apply bg-white/[0.06] backdrop-blur-md border border-white/10;
   }
 
   .glass-card {
-    @apply bg-black/40 backdrop-blur-sm border border-white/10 transition-colors hover:border-white/20 hover:bg-white/[0.02];
+    @apply bg-white/5 backdrop-blur-sm border border-white/10 transition-colors hover:border-white/20 hover:bg-white/[0.02];
   }
 
   /* Clipped Corner Elements */
@@ -122,7 +119,7 @@
 
   /* Neon Text */
   .text-glow {
-    text-shadow: 0 0 20px rgba(192, 43, 10, 0.6);
+    text-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
   }
 
   /* Marquee Animation */
@@ -232,13 +229,15 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #050505;
+  background: #0b0f19;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #C02B0A;
+  background: #ef4444;
+  border-radius: 9999px;
+  opacity: 0.7;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #97494E;
+  background: #94a3b8;
 }

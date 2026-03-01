@@ -72,10 +72,10 @@ export function Sidebar() {
             <div className={`px-4 pt-5 pb-3 flex items-center ${expanded ? "justify-between" : "justify-center"}`}>
                 {expanded && (
                     <Link href="/" className="block min-w-0">
-                        <h1 className="text-xl font-display font-black tracking-tighter text-[#C02B0A] truncate">
+                        <h1 className="text-xl font-display font-black tracking-tighter text-[#ef4444] truncate">
                             ARXION
                         </h1>
-                        <div className="font-mono text-[8px] text-[#97494E] tracking-[0.25em] mt-0.5 uppercase">
+                        <div className="font-mono text-[8px] text-[#94a3b8] tracking-[0.25em] mt-0.5 uppercase">
                             System Active
                         </div>
                     </Link>
@@ -84,14 +84,14 @@ export function Sidebar() {
                 {/* Toggle */}
                 <button
                     onClick={() => setExpanded((v) => !v)}
-                    className="hidden lg:flex items-center justify-center w-7 h-7 text-[#97494E] hover:text-[#C02B0A] hover:bg-white/[0.03] transition-all flex-shrink-0"
+                    className="hidden lg:flex items-center justify-center w-7 h-7 text-[#94a3b8] hover:text-[#ef4444] hover:bg-white/[0.03] transition-all flex-shrink-0"
                     aria-label={expanded ? "Collapse sidebar" : "Expand sidebar"}
                 >
                     {expanded ? <PanelLeftClose size={15} /> : <PanelLeft size={15} />}
                 </button>
             </div>
 
-            {expanded && <div className="mx-4 h-[1px] bg-gradient-to-r from-[#C02B0A]/40 to-transparent mb-3" />}
+            {expanded && <div className="mx-4 h-[1px] bg-gradient-to-r from-[#ef4444]/40 to-transparent mb-3" />}
             {!expanded && <div className="mb-2" />}
 
             {/* ── Navigation ── */}
@@ -106,22 +106,22 @@ export function Sidebar() {
                             title={!expanded ? link.name : undefined}
                             className={`flex items-center gap-3 px-3 py-2.5 font-mono text-[10px] tracking-[0.18em] uppercase transition-all relative group ${
                                 isActive
-                                    ? "text-[#C02B0A] bg-[#C02B0A]/[0.07]"
-                                    : "text-[#97494E] hover:text-[#C02B0A] hover:bg-white/[0.02]"
+                                    ? "text-[#ef4444] bg-[#ef4444]/[0.07]"
+                                    : "text-[#94a3b8] hover:text-[#ef4444] hover:bg-white/[0.02]"
                             } ${!expanded ? "justify-center px-0" : ""}`}
                         >
                             {/* Left accent bar */}
                             <div
                                 className={`absolute left-0 top-1 bottom-1 w-[2px] transition-all duration-200 ${
                                     isActive
-                                        ? "bg-[#C02B0A] shadow-[0_0_8px_rgba(192,43,10,0.5)]"
-                                        : "bg-transparent group-hover:bg-[#C02B0A]/30"
+                                        ? "bg-[#ef4444] shadow-[0_0_8px_rgba(192,43,10,0.5)]"
+                                        : "bg-transparent group-hover:bg-[#ef4444]/30"
                                 }`}
                             />
 
                             <Icon
                                 size={16}
-                                className={`flex-shrink-0 ${isActive ? "text-[#C02B0A]" : "opacity-50 group-hover:opacity-80"}`}
+                                className={`flex-shrink-0 ${isActive ? "text-[#ef4444]" : "opacity-50 group-hover:opacity-80"}`}
                             />
 
                             {expanded && (
@@ -131,14 +131,14 @@ export function Sidebar() {
                             )}
 
                             {/* Active glow */}
-                            {isActive && <div className="absolute inset-0 bg-[#C02B0A]/[0.03] pointer-events-none" />}
+                            {isActive && <div className="absolute inset-0 bg-[#ef4444]/[0.03] pointer-events-none" />}
                         </Link>
                     );
                 })}
             </nav>
 
             {/* ── Bottom: Status ── */}
-            <div className="px-3 py-3 border-t border-[#3C091E]/30 bg-black/30 space-y-3">
+            <div className="px-3 py-3 border-t border-[#1e293b]/30 bg-black/30 space-y-3">
                 {/* User + Status */}
                 <div className={`flex items-center ${expanded ? "gap-3" : "justify-center"}`}>
                     <UserButton
@@ -147,10 +147,10 @@ export function Sidebar() {
                             elements: {
                                 userButtonTrigger: "rounded-full focus:shadow-none focus:outline-none",
                                 userButtonBox: "w-10 h-10",
-                                avatarBox: "!rounded-full w-10 h-10 border border-[#3C091E]/40 hover:brightness-125 transition-all duration-200 cursor-pointer",
+                                avatarBox: "!rounded-full w-10 h-10 border border-[#1e293b]/40 hover:brightness-125 transition-all duration-200 cursor-pointer",
                                 avatarImage: "!rounded-full",
-                                userButtonPopoverCard: "bg-[#0a0a0a] border border-[#3C091E]/40 rounded-none",
-                                userButtonPopoverActionButton: "hover:bg-[#C02B0A]/10 rounded-none",
+                                userButtonPopoverCard: "bg-[#0d111c] border border-[#1e293b]/40 rounded-none",
+                                userButtonPopoverActionButton: "hover:bg-[#ef4444]/10 rounded-none",
                                 userButtonPopoverActionButtonText: "text-white font-mono text-xs tracking-widest",
                                 userButtonPopoverFooter: "hidden",
                             },
@@ -158,8 +158,8 @@ export function Sidebar() {
                     />
                     {expanded && (
                         <div className="flex items-center gap-2 min-w-0">
-                            <div className="w-1.5 h-1.5 bg-[#C02B0A] animate-pulse rounded-full flex-shrink-0" />
-                            <span className="font-mono text-[8px] text-[#97494E] tracking-[0.2em] uppercase truncate">
+                            <div className="w-1.5 h-1.5 bg-[#ef4444] animate-pulse rounded-full flex-shrink-0" />
+                            <span className="font-mono text-[8px] text-[#94a3b8] tracking-[0.2em] uppercase truncate">
                                 Engine Stable
                             </span>
                         </div>
@@ -168,7 +168,7 @@ export function Sidebar() {
 
                 {/* Metrics */}
                 {expanded && (
-                    <div className="flex gap-3 font-mono text-[7px] text-[#3C091E] uppercase tracking-[0.2em]">
+                    <div className="flex gap-3 font-mono text-[7px] text-[#1e293b] uppercase tracking-[0.2em]">
                         <span>MEM: 64.2%</span>
                         <span>GPU: ON</span>
                         <span>RCI: OK</span>
@@ -178,7 +178,7 @@ export function Sidebar() {
                 {/* Disconnect */}
                 <SignOutButton>
                     <button
-                        className={`flex items-center gap-2.5 text-[#97494E] hover:text-[#C02B0A] transition-colors font-mono text-[9px] tracking-[0.2em] uppercase w-full ${
+                        className={`flex items-center gap-2.5 text-[#94a3b8] hover:text-[#ef4444] transition-colors font-mono text-[9px] tracking-[0.2em] uppercase w-full ${
                             !expanded ? "justify-center" : ""
                         }`}
                         title={!expanded ? "DISCONNECT" : undefined}
@@ -196,17 +196,17 @@ export function Sidebar() {
             {/* ════════ MOBILE: Hamburger Toggle ════════ */}
             <button
                 onClick={() => setMobileOpen(true)}
-                className="fixed top-4 left-4 z-[70] w-9 h-9 flex lg:hidden flex-col items-center justify-center gap-[5px] bg-[#050505] border border-[#3C091E]/40 hover:border-[#C02B0A]/60 transition-all"
+                className="fixed top-4 left-4 z-[70] w-9 h-9 flex lg:hidden flex-col items-center justify-center gap-[5px] bg-[#0b0f19] border border-[#1e293b]/40 hover:border-[#ef4444]/60 transition-all"
                 aria-label="Open sidebar"
             >
-                <span className="block w-4 h-[1.5px] bg-[#97494E]" />
-                <span className="block w-4 h-[1.5px] bg-[#97494E]" />
-                <span className="block w-4 h-[1.5px] bg-[#97494E]" />
+                <span className="block w-4 h-[1.5px] bg-[#94a3b8]" />
+                <span className="block w-4 h-[1.5px] bg-[#94a3b8]" />
+                <span className="block w-4 h-[1.5px] bg-[#94a3b8]" />
             </button>
 
             {/* ════════ MOBILE: Backdrop ════════ */}
             <div
-                className={`fixed inset-0 z-[59] bg-black/60 backdrop-blur-[2px] lg:hidden transition-opacity duration-300 ${
+                className={`fixed inset-0 z-[59] bg-white/[0.06] backdrop-blur-[2px] lg:hidden transition-opacity duration-300 ${
                     mobileOpen ? "opacity-100" : "opacity-0 pointer-events-none"
                 }`}
                 onClick={closeMobile}
@@ -216,7 +216,7 @@ export function Sidebar() {
             {/* ════════ MOBILE: Overlay Sidebar ════════ */}
             <aside
                 ref={sidebarRef}
-                className={`fixed top-0 left-0 z-[60] w-[240px] h-screen bg-[#050505] border-r border-[#3C091E]/30 lg:hidden transition-transform duration-300 ease-in-out ${
+                className={`fixed top-0 left-0 z-[60] w-[240px] h-screen bg-[#0b0f19] border-r border-[#1e293b]/30 lg:hidden transition-transform duration-300 ease-in-out ${
                     mobileOpen ? "translate-x-0" : "-translate-x-full"
                 }`}
                 role="navigation"
@@ -226,7 +226,7 @@ export function Sidebar() {
 
             {/* ════════ DESKTOP: Push Sidebar ════════ */}
             <aside
-                className={`hidden lg:flex flex-col h-screen bg-[#050505] border-r border-[#3C091E]/30 flex-shrink-0 transition-all duration-300 ease-in-out ${
+                className={`hidden lg:flex flex-col h-screen bg-[#0b0f19] border-r border-[#1e293b]/30 flex-shrink-0 transition-all duration-300 ease-in-out ${
                     expanded ? "w-[240px]" : "w-[70px]"
                 }`}
                 role="navigation"
