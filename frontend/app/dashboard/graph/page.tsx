@@ -34,7 +34,7 @@ const generateNodes = () => {
 };
 
 const generateEdges = (nodes: any[]) => {
-    const edges = [];
+    const edges: any[] = [];
     nodes.forEach((n, i) => {
         if (n.type === 0) { // If paper
             // Connect to 1 random dataset
