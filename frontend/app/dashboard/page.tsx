@@ -1,8 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { AlertTriangle, Code, CheckCircle2, ChevronRight, FileX2 } from "lucide-react";
+import axios from "axios";
 
 // Mock Data for the Heatmap / Chart
 const data = [
@@ -39,6 +41,26 @@ function MetricCard({ title, value, sub, warning = false }: any) {
 }
 
 export default function FieldHealthDashboard() {
+    const [stats, setStats] = useState({
+        totalPapers: 0,
+        rciDisplay: "82.4%", // default mock if no data
+    });
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await axios.get("http://localhost:8000/api/v1/papers");
+                const papers = res.data;
+                setStats({
+                    totalPapers: papers.length,
+                    rciDisplay: papers.length > 0 ? "87.1%" : "--", // Simulated RCI avg
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        fetchStats();
+    }, []);
     return (
         <div className="h-full w-full flex flex-col gap-8">
 
@@ -61,10 +83,10 @@ export default function FieldHealthDashboard() {
 
             {/* Main KPI Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <MetricCard title="Arxion Credibility (RCI)" value="82.4%" sub="Global Field Average" />
+                <MetricCard title="Arxion Credibility (RCI)" value={stats.rciDisplay} sub="Global Field Average" />
                 <MetricCard title="Public Code Avail." value="34.1%" sub="12% decline vs 2025" warning />
                 <MetricCard title="Hyperparam Veil" value="68.9%" sub="Training params missing" warning />
-                <MetricCard title="Total Ingested" value="14,092" sub="Papers verified" />
+                <MetricCard title="Total Ingested" value={stats.totalPapers.toString()} sub="Papers verified" />
             </div>
 
             {/* Chart & Live Feed */}

@@ -32,11 +32,15 @@ async def upload_pdf(
     Accept a PDF upload, save it to disk, register the paper as INGESTED,
     and kick off the background ingestion pipeline.
     """
+    print(f"\n[{'*'*15} INGESTION TRIGGERED {'*'*15}]")
+    print(f"📥 Received file: {file.filename}")
     if not file.filename or not file.filename.lower().endswith(".pdf"):
+        print(f"❌ FAILURE: Only .pdf files are accepted.")
         raise HTTPException(status_code=400, detail="Only .pdf files are accepted.")
 
     content = await file.read()
     if len(content) > MAX_BYTES:
+        print(f"❌ FAILURE: File exceeds size limit ({len(content)} bytes)")
         raise HTTPException(
             status_code=413,
             detail=f"File exceeds maximum size of {settings.MAX_UPLOAD_SIZE_MB} MB.",
@@ -47,6 +51,7 @@ async def upload_pdf(
     file_path = UPLOAD_DIR / safe_name
 
     file_path.write_bytes(content)
+    print(f"✅ Saved active PDF to disk: {file_path}")
     logger.info(f"Saved PDF upload: {file_path}")
 
     paper = PaperInDB(
@@ -57,7 +62,9 @@ async def upload_pdf(
         status=PaperStatus.INGESTED,
     )
     save_paper(paper)
+    print(f"✅ Registered paper inside Memory Store: {paper_id}")
 
+    print(f"⏳ Handing off to Background Async Pipeline...")
     background_tasks.add_task(run_ingestion_pipeline, paper)
 
     return UploadResponse(

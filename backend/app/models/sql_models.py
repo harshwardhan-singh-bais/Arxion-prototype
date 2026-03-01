@@ -42,6 +42,7 @@ class Paper(Base):
     progress_percentage = Column(Integer, default=0)
     rci_score = Column(Float, nullable=True)
     error_message = Column(Text, nullable=True)
+    extracted_data = Column(JSON, default=dict)
     created_at = Column(DateTime(timezone=True), default=_utcnow)
     updated_at = Column(DateTime(timezone=True), default=_utcnow, onupdate=_utcnow)
 

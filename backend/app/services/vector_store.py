@@ -14,11 +14,13 @@ logger = logging.getLogger(__name__)
 
 async def store_chunks(paper_id: str, chunks: list[str]) -> None:
     """Embed each chunk and upsert into the chunks collection."""
+    import asyncio
     client = get_qdrant()
     points: list[PointStruct] = []
 
     for i, chunk in enumerate(chunks):
         try:
+            print(f"      - Embedding chunk [{i+1}/{len(chunks)}]...")
             embedding = await get_embeddings(chunk)
             points.append(
                 PointStruct(
@@ -31,14 +33,22 @@ async def store_chunks(paper_id: str, chunks: list[str]) -> None:
                     },
                 )
             )
+            # Prevent Google Free Tier 429 RPM limits.
+            await asyncio.sleep(1.0)
         except Exception as e:
+            print(f"      ❌ ERROR: Failed to embed chunk {i}: {e}")
             logger.error(f"Failed to embed chunk {i} for paper {paper_id}: {e}")
 
     if points:
-        await client.upsert(
-            collection_name=settings.QDRANT_COLLECTION_CHUNKS,
-            points=points,
-        )
+        BATCH_SIZE = 50
+        print(f"   ✓ Pushing {len(points)} Chunk points natively into Qdrant server in batches...")
+        for i in range(0, len(points), BATCH_SIZE):
+            batch = points[i:i + BATCH_SIZE]
+            await client.upsert(
+                collection_name=settings.QDRANT_COLLECTION_CHUNKS,
+                points=batch,
+                wait=False,
+            )
         logger.info(f"Stored {len(points)} chunk vectors for paper {paper_id}.")
 
 
@@ -64,16 +74,23 @@ async def store_claims(paper_id: str, claims: list[str]) -> None:
             logger.error(f"Failed to embed claim for paper {paper_id}: {e}")
 
     if points:
-        await client.upsert(
-            collection_name=settings.QDRANT_COLLECTION_CLAIMS,
-            points=points,
-        )
+        BATCH_SIZE = 50
+        for i in range(0, len(points), BATCH_SIZE):
+            batch = points[i:i + BATCH_SIZE]
+            await client.upsert(
+                collection_name=settings.QDRANT_COLLECTION_CLAIMS,
+                points=batch,
+                wait=False,
+            )
         logger.info(f"Stored {len(points)} claim vectors for paper {paper_id}.")
 
 
 async def search_chunks(query: str, paper_ids: list[str] | None = None, limit: int = 10) -> list[dict]:
     """Semantic search over chunks. Optionally scoped to a list of paper_ids."""
+    print(f"\n🔍 [QDRANT DB] Executing Vector Search...")
+    print(f"   Target limit: {limit}, Target paper scope: {paper_ids}")
     client = get_qdrant()
+    print(f"   Converting query to high-dimensional math vector...")
     query_vector = await get_embeddings(query)
 
     query_filter = None
@@ -83,9 +100,9 @@ async def search_chunks(query: str, paper_ids: list[str] | None = None, limit: i
             must=[FieldCondition(key="paper_id", match=MatchAny(any=paper_ids))]
         )
 
-    results = await client.search(
+    results = await client.query_points(
         collection_name=settings.QDRANT_COLLECTION_CHUNKS,
-        query_vector=query_vector,
+        query=query_vector,
         query_filter=query_filter,
         limit=limit,
         with_payload=True,
@@ -98,7 +115,7 @@ async def search_chunks(query: str, paper_ids: list[str] | None = None, limit: i
             "chunk_index": r.payload.get("chunk_index"),
             "text": r.payload.get("text"),
         }
-        for r in results
+        for r in results.points
     ]
 
 

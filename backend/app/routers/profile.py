@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.auth import get_current_user_id
 from app.core.database_sql import get_db
-from app.models.sql_models import UserProfile, PaperRecord, GapRecord
+from app.models.sql_models import User, Paper, Gap
 
 router = APIRouter()
 
@@ -32,18 +32,18 @@ async def get_profile(
     user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(select(UserProfile).where(UserProfile.clerk_user_id == user_id))
+    result = await db.execute(select(User).where(User.clerk_id == user_id))
     profile = result.scalar_one_or_none()
 
     if not profile:
-        profile = UserProfile(clerk_user_id=user_id, display_name="")
+        profile = User(clerk_id=user_id, name="")
         db.add(profile)
         await db.commit()
         await db.refresh(profile)
 
     # Count papers
     papers_result = await db.execute(
-        select(PaperRecord).where(PaperRecord.clerk_user_id == user_id)
+        select(Paper).where(Paper.user_id == profile.id)
     )
     papers = papers_result.scalars().all()
     papers_count = len(papers)
@@ -51,13 +51,13 @@ async def get_profile(
 
     # Count gaps
     gaps_result = await db.execute(
-        select(GapRecord).where(GapRecord.clerk_user_id == user_id)
+        select(Gap).where(Gap.user_id == profile.id)
     )
     gaps_count = len(gaps_result.scalars().all())
 
     return ProfileResponse(
-        clerk_user_id=profile.clerk_user_id,
-        display_name=profile.display_name,
+        clerk_user_id=profile.clerk_id,
+        display_name=profile.name,
         papers_count=papers_count,
         processed_count=processed_count,
         gaps_count=gaps_count,
@@ -70,19 +70,19 @@ async def update_profile(
     user_id: str = Depends(get_current_user_id),
     db: AsyncSession = Depends(get_db),
 ):
-    result = await db.execute(select(UserProfile).where(UserProfile.clerk_user_id == user_id))
+    result = await db.execute(select(User).where(User.clerk_id == user_id))
     profile = result.scalar_one_or_none()
 
     if not profile:
-        profile = UserProfile(clerk_user_id=user_id, display_name=data.display_name)
+        profile = User(clerk_id=user_id, name=data.display_name)
         db.add(profile)
     else:
-        profile.display_name = data.display_name
+        profile.name = data.display_name
 
     await db.commit()
     await db.refresh(profile)
 
     return ProfileResponse(
-        clerk_user_id=profile.clerk_user_id,
-        display_name=profile.display_name,
+        clerk_user_id=profile.clerk_id,
+        display_name=profile.name,
     )

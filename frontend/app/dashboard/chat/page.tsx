@@ -3,29 +3,56 @@
 import { useState } from "react";
 import { Send, CornerDownLeft, Database, Search } from "lucide-react";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 export default function ChatMatrixPage() {
     const [query, setQuery] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const [chat, setChat] = useState([
         {
             role: "system",
-            content: "ARXION KNOWLEDGE MATRIX ACTIVE. 14,092 VECTORS LOADED. ENTER QUERY.",
-            sources: []
-        },
-        {
-            role: "user",
-            content: "What is the primary contradiction between ARX-711 and ARX-992 regarding sequence length scaling?",
-            sources: []
-        },
-        {
-            role: "assistant", // "matrix"
-            content: "Based on the extracted baseline statements, ARX-711 claims O(N) scaling using a Mamba-derived state-space formulation. However, ARX-992's empirical ablation study (Table 4) demonstrates O(N log N) degradation when sequence length exceeds 32K tokens in actual multi-node deployments. This represents a 43% performance contradiction in assumed theoretical capability versus hardware execution.",
-            sources: [
-                { id: "ARX-711", section: "Abstract", conf: 0.92 },
-                { id: "ARX-992", section: "4.1 Extrapolation", conf: 0.88 },
-            ]
+            content: "ARXION KNOWLEDGE MATRIX ACTIVE. WAITING FOR QUERY TO ANALYZE EXTRACTED LITERATURE.",
+            sources: [] as Array<{ id: string, section: string, conf: number }>
         }
     ]);
+
+    const handleSend = async () => {
+        if (!query.trim() || isLoading) return;
+
+        const text = query;
+        setQuery("");
+        setChat(prev => [...prev, { role: "user", content: text, sources: [] }]);
+        setIsLoading(true);
+
+        try {
+            const res = await axios.post("http://localhost:8000/api/v1/chat", {
+                query: text,
+                paper_ids: null // Will search across all ingested papers
+            });
+
+            const answer = res.data.answer;
+            const citations = res.data.citations.map((c: any) => ({
+                id: c.paper_id,
+                section: `Chunk ${c.chunk_index}`,
+                conf: parseFloat(c.score).toFixed(2)
+            }));
+
+            setChat(prev => [...prev, {
+                role: "assistant",
+                content: answer,
+                sources: citations
+            }]);
+        } catch (error) {
+            console.error("Chat Error:", error);
+            setChat(prev => [...prev, {
+                role: "system",
+                content: "NETWORK ERROR: COULD NOT CONNECT TO ARXION MATRIX CORE.",
+                sources: []
+            }]);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="h-full w-full flex flex-col gap-8 max-w-[1200px] mx-auto pb-4">
@@ -84,10 +111,16 @@ export default function ChatMatrixPage() {
                     type="text"
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
-                    placeholder="QUERY THE KNOWLEDGE MATRIX..."
-                    className="w-full bg-[#050505] border-2 border-[#3C091E] focus:border-[#C02B0A] outline-none text-white font-mono uppercase tracking-widest px-6 py-6 pr-24 clip-card transition-colors placeholder:text-[#3C091E]"
+                    onKeyDown={(e) => { if (e.key === "Enter") handleSend(); }}
+                    placeholder={isLoading ? "ANALYZING LITERATURE..." : "QUERY THE KNOWLEDGE MATRIX..."}
+                    disabled={isLoading}
+                    className="w-full bg-[#050505] border-2 border-[#3C091E] focus:border-[#C02B0A] outline-none text-white font-mono uppercase tracking-widest px-6 py-6 pr-24 clip-card transition-colors placeholder:text-[#3C091E] disabled:opacity-50"
                 />
-                <button className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-12 h-12 bg-[#3C091E] hover:bg-[#C02B0A] text-white transition-colors clip-button">
+                <button
+                    onClick={handleSend}
+                    disabled={isLoading}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center justify-center w-12 h-12 bg-[#3C091E] hover:bg-[#C02B0A] text-white transition-colors clip-button disabled:bg-[#3C091E]/50"
+                >
                     <CornerDownLeft size={18} />
                 </button>
             </div>

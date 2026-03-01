@@ -1,0 +1,223 @@
+{
+  "dd3031fc-7294-45c2-9901-fcb8373beec7": {
+    "title": "Attention Is All You Need",
+    "authors": [
+      "Ashish Vaswani",
+      "Noam Shazeer",
+      "Niki Parmar",
+      "Jakob Uszkoreit",
+      "Llion Jones",
+      "Aidan N. Gomez",
+      "\u0141ukasz Kaiser",
+      "Illia Polosukhin"
+    ],
+    "abstract": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks that include an encoder and a decoder. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles, by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
+    "year": 2017,
+    "tags": [
+      "Machine Translation",
+      "Neural Networks",
+      "Attention Mechanisms",
+      "Transformers",
+      "Natural Language Processing"
+    ],
+    "id": "dd3031fc-7294-45c2-9901-fcb8373beec7",
+    "filename": "1706.03762v7.pdf",
+    "file_path": "uploads\\dd3031fc-7294-45c2-9901-fcb8373beec7_1706.03762v7.pdf",
+    "status": "PROCESSED",
+    "error_message": null,
+    "claims": [
+      {
+        "statement": "The Transformer, a new simple network architecture, is based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+        "evidence": [
+          {
+            "section": "Abstract",
+            "page": null,
+            "snippet": "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely."
+          },
+          {
+            "section": "1 Introduction",
+            "page": null,
+            "snippet": "In this work we propose the Transformer, a model architecture eschewing recurrence and instead relying entirely on an attention mechanism to draw global dependencies between input and output."
+          }
+        ]
+      },
+      {
+        "statement": "The Transformer models are superior in quality, more parallelizable, and require significantly less training time on machine translation tasks.",
+        "evidence": [
+          {
+            "section": "Abstract",
+            "page": null,
+            "snippet": "Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train."
+          },
+          {
+            "section": "1 Introduction",
+            "page": null,
+            "snippet": "The Transformer allows for significantly more parallelization and can reach a new state of the art in translation quality after being trained for as little as twelve hours on eight P100 GPUs."
+          }
+        ]
+      },
+      {
+        "statement": "The Transformer achieves a new state-of-the-art BLEU score of 28.4 on the WMT 2014 English-to-German translation task, surpassing existing best results, including ensembles, by over 2 BLEU.",
+        "evidence": [
+          {
+            "section": "Abstract",
+            "page": null,
+            "snippet": "Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles, by over 2 BLEU."
+          },
+          {
+            "section": "6.1 Machine Translation",
+            "page": 8,
+            "snippet": "On the WMT 2014 English-to-German translation task, the big transformer model (Transformer (big) in Table 2) outperforms the best previously reported models (including ensembles) by more than 2.0 BLEU, establishing a new state-of-the-art BLEU score of 28.4."
+          }
+        ]
+      },
+      {
+        "statement": "The Transformer establishes a new single-model state-of-the-art BLEU score of 41.8 on the WMT 2014 English-to-French translation task.",
+        "evidence": [
+          {
+            "section": "Abstract",
+            "page": null,
+            "snippet": "On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature."
+          },
+          {
+            "section": "6.1 Machine Translation",
+            "page": 8,
+            "snippet": "On the WMT 2014 English-to-French translation task, our big model achieves a BLEU score of 41.0 [Table 2 indicates 41.8], outperforming all of the previously published single models, at less than 1/4the training cost of the previous state-of-the-art model."
+          }
+        ]
+      },
+      {
+        "statement": "The Transformer generalizes well to other tasks, demonstrated by its successful application to English constituency parsing with both large and limited training data.",
+        "evidence": [
+          {
+            "section": "Abstract",
+            "page": null,
+            "snippet": "We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data."
+          },
+          {
+            "section": "6.3 English Constituency Parsing",
+            "page": 9,
+            "snippet": "Our results in Table 4 show that despite the lack of task-specific tuning our model performs surprisingly well, yielding better results than all previously reported models with the exception of the Recurrent Neural Network Grammar [8]."
+          }
+        ]
+      }
+    ],
+    "datasets": [
+      {
+        "name": "WMT 2014 English-German dataset",
+        "description": "About 4.5 million sentence pairs, encoded using byte-pair encoding with a shared source-target vocabulary of about 37000 tokens.",
+        "source": "standard WMT 2014"
+      },
+      {
+        "name": "WMT 2014 English-French dataset",
+        "description": "About 36 million sentence pairs, with tokens split into a 32000 word-piece vocabulary.",
+        "source": "standard WMT 2014"
+      },
+      {
+        "name": "Wall Street Journal (WSJ) portion of the Penn Treebank",
+        "description": "About 40K training sentences for English constituency parsing. Used a vocabulary of 16K tokens for WSJ only setting.",
+        "source": "[25]"
+      },
+      {
+        "name": "high-confidence and BerkeleyParser corpora",
+        "description": "Approximately 17M sentences, used in a semi-supervised setting for English constituency parsing. Used a vocabulary of 32K tokens for the semi-supervised setting.",
+        "source": "[37]"
+      }
+    ],
+    "methods": [
+      {
+        "name": "Transformer",
+        "description": "A new network architecture based entirely on attention mechanisms, eschewing recurrence and convolutions. It follows an encoder-decoder structure using stacked self-attention and point-wise, fully connected layers for both the encoder and decoder. Both encoder and decoder are composed of N=6 identical layers, using residual connections and layer normalization."
+      },
+      {
+        "name": "Scaled Dot-Product Attention",
+        "description": "An attention function where the output is computed as a weighted sum of values. It computes dot products of the query with all keys, divides each by the square root of key dimension (\u221adk), and applies a softmax function to obtain weights on the values."
+      },
+      {
+        "name": "Multi-Head Attention",
+        "description": "Instead of a single attention function, queries, keys, and values are linearly projected h times with different learned linear projections. The attention function is performed in parallel on these projected versions, yielding multiple output values which are then concatenated and projected again. This allows the model to jointly attend to information from different representation subspaces at different positions."
+      },
+      {
+        "name": "Position-wise Feed-Forward Networks",
+        "description": "A fully connected feed-forward network applied to each position separately and identically within each encoder and decoder layer. It consists of two linear transformations with a ReLU activation in between. Dimensionality of input/output is dmodel=512, inner-layer dff=2048."
+      },
+      {
+        "name": "Positional Encoding",
+        "description": "Information about the relative or absolute position of tokens in the sequence is injected by adding 'positional encodings' to the input embeddings. Uses sine and cosine functions of different frequencies."
+      },
+      {
+        "name": "Residual Dropout",
+        "description": "Dropout applied to the output of each sub-layer (before adding to sub-layer input and normalization) and to the sums of the embeddings and positional encodings in both encoder and decoder stacks."
+      },
+      {
+        "name": "Label Smoothing",
+        "description": "A regularization technique employed during training with a value of \u03b5ls=0.1."
+      }
+    ],
+    "metrics": [
+      {
+        "metric_name": "BLEU",
+        "value": "28.4",
+        "dataset": "WMT 2014 English-to-German translation task",
+        "comparison_baseline": "GNMT + RL Ensemble (26.30), ConvS2S Ensemble (26.36), Deep-Att + PosUnk Ensemble (26.30)"
+      },
+      {
+        "metric_name": "BLEU",
+        "value": "41.8",
+        "dataset": "WMT 2014 English-to-French translation task",
+        "comparison_baseline": "ConvS2S Ensemble (41.29), GNMT + RL Ensemble (41.16), Deep-Att + PosUnk Ensemble (40.4)"
+      },
+      {
+        "metric_name": "BLEU",
+        "value": "27.3",
+        "dataset": "WMT 2014 English-to-German translation task",
+        "comparison_baseline": "ByteNet (23.75), GNMT + RL (24.6), ConvS2S (25.16), MoE (26.03)"
+      },
+      {
+        "metric_name": "BLEU",
+        "value": "38.1",
+        "dataset": "WMT 2014 English-to-French translation task",
+        "comparison_baseline": null
+      },
+      {
+        "metric_name": "F1",
+        "value": "91.3",
+        "dataset": "English Constituency Parsing (WSJ only)",
+        "comparison_baseline": "Vinyals & Kaiser el al. (2014) (88.3), Petrov et al. (2006) (90.4), Zhu et al. (2013) (90.4)"
+      },
+      {
+        "metric_name": "F1",
+        "value": "92.7",
+        "dataset": "English Constituency Parsing (semi-supervised)",
+        "comparison_baseline": "Zhu et al. (2013) (91.3), Huang & Harper (2009) (91.3), McClosky et al. (2006) (92.1), Vinyals & Kaiser el al. (2014) (92.1)"
+      }
+    ],
+    "limitations": [
+      {
+        "description": "The Transformer is currently primarily applied to text modalities; extending it to other input and output modalities like images, audio, and video is future work."
+      },
+      {
+        "description": "Current attention mechanisms may be inefficient for very large inputs; local, restricted attention mechanisms need further investigation to handle such data effectively."
+      },
+      {
+        "description": "The generation process is still sequential; making it less sequential is an ongoing research goal."
+      },
+      {
+        "description": "While performing surprisingly well, the Transformer (4 layers) did not outperform all previously reported models for English constituency parsing, specifically the Recurrent Neural Network Grammar [8]."
+      }
+    ],
+    "baseline": "Recurrent and Convolutional Neural Networks (Encoder-Decoder models) such as ByteNet, Deep-Att + PosUnk, GNMT + RL, ConvS2S, and Mixture-of-Experts (MoE) models for machine translation, and various discriminative and semi-supervised parsers for constituency parsing.",
+    "hyperparameters": {
+      "disclosed": true,
+      "details": "Encoder/Decoder layers (N): 6 (base), 4 (parsing); Model dimension (dmodel): 512 (base), 1024 (big/parsing); Feed-forward inner-layer dimensionality (dff): 2048 (base), 4096 (big); Number of attention heads (h): 8 (base), 16 (big); Attention key/value dimensions (dk, dv): 64; Dropout rate (Pdrop): 0.1 (base, EN-FR big), 0.3 (EN-DE big); Label smoothing (\u03f5ls): 0.1; Optimizer: Adam (\u03b21=0.9, \u03b22=0.98, \u03f5=10^-9); Learning rate schedule: lrate = dmodel^-0.5 * min(step_num^-0.5, step_num * warmup_steps^-1.5); Warmup steps: 4000; Batching: ~25000 source tokens and 25000 target tokens per batch; Beam search (translation): beam size 4, length penalty \u03b1=0.6; Beam search (parsing): beam size 21, \u03b1=0.3; Max output length (translation): input length + 50; Max output length (parsing): input length + 300."
+    },
+    "compute": {
+      "disclosed": true,
+      "gpu_type": "NVIDIA P100",
+      "gpu_hours": 672.0,
+      "details": "Models were trained on one machine with 8 NVIDIA P100 GPUs. Base models were trained for 100,000 steps (12 hours) with a step time of 0.4 seconds. Big models were trained for 300,000 steps (3.5 days) with a step time of 1.0 seconds. The 41.8 BLEU result on WMT 2014 EN-FR specifically mentioned 3.5 days on eight GPUs."
+    },
+    "code_link": "https://github.com/tensorflow/tensor2tensor",
+    "data_link": null
+  }
+}

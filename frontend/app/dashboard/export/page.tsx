@@ -1,17 +1,44 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DownloadCloud, Quote, FileText, CheckSquare, Layers, FileJson } from "lucide-react";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 export default function ExportDraftsPage() {
     const [selectedFormat, setSelectedFormat] = useState("bibtex");
+    const [isLoading, setIsLoading] = useState(false);
+    const [previewContent, setPreviewContent] = useState<string>("");
 
-    const selectedPapers = [
-        { id: "ARX-142", title: "Mamba: Linear-Time Sequence Modeling with Selective State Spaces" },
-        { id: "ARX-811", title: "Direct Preference Optimization" },
-        { id: "ARX-990", title: "Llama 2: Open Foundation and Fine-Tuned Chat Models" }
-    ];
+    // Default papers we expect if the vector database isn't fully loaded
+    const [selectedPapers, setSelectedPapers] = useState([
+        { id: "ARX-142", title: "Mamba (Mock)" },
+        { id: "ARX-811", title: "DPO (Mock)" },
+    ]);
+
+    // Ideally, we'd fetch actual papers from a GET /api/v1/papers endpoint here
+    // but for now we pass the mock IDs. The backend will fail if these IDs don't exist.
+
+    const handleExport = async () => {
+        if (selectedPapers.length === 0) return;
+        setIsLoading(true);
+        setPreviewContent("GENERATING ARTIFACT... PLEASE WAIT.");
+
+        try {
+            const paperIds = selectedPapers.map(p => p.id);
+            const res = await axios.post("http://localhost:8000/api/v1/export", {
+                paper_ids: paperIds,
+                format: selectedFormat
+            });
+
+            setPreviewContent(res.data.content);
+        } catch (error: any) {
+            console.error("Export Error:", error);
+            setPreviewContent(`NETWORK ERROR: COULD NOT GENERATE EXPORT.\n\nNote: Make sure paper IDs exist in the database.\nMessage: ${error.message}`);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <div className="h-full w-full flex flex-col gap-8 max-w-[1200px] mx-auto pb-10">
@@ -73,8 +100,12 @@ export default function ExportDraftsPage() {
                             ))}
                         </div>
 
-                        <button className="mt-8 w-full flex items-center justify-center gap-3 bg-[#3C091E] hover:bg-[#C02B0A] text-white p-4 font-mono text-xs tracking-widest uppercase transition-colors clip-button">
-                            <DownloadCloud size={16} /> GENERATE ARTIFACT
+                        <button
+                            onClick={handleExport}
+                            disabled={isLoading}
+                            className="mt-8 w-full flex items-center justify-center gap-3 bg-[#3C091E] hover:bg-[#C02B0A] text-white p-4 font-mono text-xs tracking-widest uppercase transition-colors clip-button disabled:opacity-50"
+                        >
+                            <DownloadCloud size={16} /> {isLoading ? "GENERATING..." : "GENERATE ARTIFACT"}
                         </button>
                     </div>
 
@@ -91,48 +122,14 @@ export default function ExportDraftsPage() {
                     </div>
 
                     <div className="flex-1 overflow-y-auto pr-4 font-mono text-xs text-white/80 leading-loose tracking-wide whitespace-pre-wrap">
-                        {selectedFormat === 'bibtex' && (
+                        {previewContent ? (
                             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                                <span className="text-[#C02B0A]">@inproceedings</span>{`{gu2023mamba,
-   title={Mamba: Linear-Time Sequence Modeling with Selective State Spaces},
-   author={Gu, Albert and Dao, Tri},
-   booktitle={ArXiv},
-   year={2023}
-}`}<br /><br />
-                                <span className="text-[#C02B0A]">@article</span>{`{rafailov2023dpo,
-   title={Direct Preference Optimization: Your Language Model is Secretly a Reward Model},
-   author={Rafailov, Rafael and Sharma, Archit and Mitchell, Eric and Manning, Christopher D and Ermon, Stefano and Finn, Chelsea},
-   journal={NeurIPS},
-   year={2023}
-}`}
+                                {previewContent}
                             </motion.div>
-                        )}
-
-                        {selectedFormat === 'csv_matrix' && (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="overflow-x-auto text-[10px]">
-                                ID, TITLE, AUTHORS, RCI_SCORE, REPRODUCIBILITY, DATASETS_USED, METHODS_USED<br />
-                                ARX-142, "Mamba: Linear-Time Sequence Modeling...", "Gu, Dao", 94.2, 92, "Pile; SlimPajama", "Selective SSM"<br />
-                                ARX-811, "Direct Preference Optimization...", "Rafailov et al.", 88.5, 96, "Anthropic HH; Reddit TLDR", "DPO"<br />
-                                ARX-990, "Llama 2: Open Foundation...", "Touvron et al.", 90.0, 85, "Public Web Custom", "GQA; RLHF"
-                            </motion.div>
-                        )}
-
-                        {selectedFormat === 'related_work_draft' && (
-                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-                                <h4 className="font-bold text-white mb-4 text-sm font-sans uppercase">2. Related Work</h4>
-
-                                <p className="mb-4">
-                                    Recent advancements in foundation models have largely been driven by scaling transformer architectures [ARX-990] and refining alignment techniques. While Reinforcement Learning from Human Feedback (RLHF) established the standard for model alignment, it suffers from significant optimization instability. <span className="bg-[#3C091E] text-white px-1">To address this, [ARX-811] introduced Direct Preference Optimization (DPO), which elegantly circumvents the need for an explicit reward model by re-parameterizing the policy itself.</span>
-                                </p>
-
-                                <p>
-                                    Concurrently, the quadratic scaling bottleneck of self-attention has motivated the search for sub-quadratic alternatives. <span className="bg-[#3C091E] text-white px-1">Among recent state-space models, Mamba [ARX-142] has demonstrated strong empirical results by incorporating data-dependent selectivity.</span> Our work builds directly upon the hardware-aware selective scan mechanisms detailed by Gu and Dao, while addressing the missing reproducibility constraints identified during the evaluation of DPO [ARX-811].
-                                </p>
-
-                                <div className="mt-8 p-4 border border-[#C02B0A]/30 bg-black text-[#C02B0A] text-[9px] uppercase tracking-widest">
-                                    [SYS] Arxion positioned your draft by bridging [ARX-990] base scaling with [ARX-811] alignment and [ARX-142] hardware bottlenecks.
-                                </div>
-                            </motion.div>
+                        ) : (
+                            <div className="opacity-50 h-full flex items-center justify-center text-[#97494E]">
+                                WAITING FOR GENERATION TRIGGER...
+                            </div>
                         )}
                     </div>
 

@@ -15,15 +15,33 @@ class Base(DeclarativeBase):
     pass
 
 
-engine = create_async_engine(
-    settings.DATABASE_URL,
-    echo=settings.DEBUG,
-    pool_size=5,
-    max_overflow=10,
-    pool_pre_ping=True,
-    pool_recycle=300,
-    connect_args={"ssl": "require"} if "neon" in settings.DATABASE_URL else {},
-)
+db_url = settings.DATABASE_URL
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql+asyncpg://", 1)
+elif db_url.startswith("postgresql://"):
+    db_url = db_url.replace("postgresql://", "postgresql+asyncpg://", 1)
+
+# asyncpg does not support ?sslmode=require in the connection string.
+# We strip query params and manually pass {"ssl": "require"} to connect_args
+if "?" in db_url:
+    db_url = db_url.split("?")[0]
+
+is_sqlite = db_url.startswith("sqlite")
+
+engine_kwargs = {
+    "echo": settings.DEBUG,
+}
+
+if not is_sqlite:
+    engine_kwargs.update({
+        "pool_size": 5,
+        "max_overflow": 10,
+        "pool_pre_ping": True,
+        "pool_recycle": 300,
+        "connect_args": {"ssl": "require"} if "neon" in db_url else {}
+    })
+
+engine = create_async_engine(db_url, **engine_kwargs)
 SessionLocal = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 

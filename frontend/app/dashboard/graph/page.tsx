@@ -3,58 +3,15 @@
 import dynamic from "next/dynamic";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { OrbitControls, Instances, Instance, Html, Line, Sphere, Trail } from "@react-three/drei";
-import { useRef, useMemo, useState } from "react";
+import { useRef, useMemo, useState, useEffect } from "react";
 import * as THREE from "three";
 import { Layers, FileText, Settings2, Link } from "lucide-react";
-
-// Massive Graph Data Simulation
-const GRAPH_SIZE = 120;
-const D_SIZE = 15;
-const M_SIZE = 10;
+import axios from "axios";
 
 // Type: 0 = Paper (White), 1 = Dataset (Orange), 2 = Method (Dark Red)
-const generateNodes = () => {
-    const nodes = [];
-    for (let i = 0; i < GRAPH_SIZE; i++) {
-        const type = i < D_SIZE ? 1 : i < D_SIZE + M_SIZE ? 2 : 0;
-        nodes.push({
-            id: i,
-            type,
-            pos: [
-                (Math.random() - 0.5) * 40,
-                (Math.random() - 0.5) * 40,
-                (Math.random() - 0.5) * 40
-            ],
-            size: type === 0 ? 0.3 : type === 1 ? 0.8 : 0.6,
-            color: type === 0 ? "#ffffff" : type === 1 ? "#C02B0A" : "#3C091E",
-            label: type === 0 ? `ARX-${200 + i}` : type === 1 ? `DATA-${i}` : `METH-${i}`
-        });
-    }
-    return nodes;
-};
-
-const generateEdges = (nodes: any[]) => {
-    const edges = [];
-    nodes.forEach((n, i) => {
-        if (n.type === 0) { // If paper
-            // Connect to 1 random dataset
-            const dsIndex = Math.floor(Math.random() * D_SIZE);
-            edges.push([n.pos, nodes[dsIndex].pos, "#C02B0A"]);
-            // Connect to 1 random method
-            const mIndex = Math.floor(Math.random() * M_SIZE) + D_SIZE;
-            edges.push([n.pos, nodes[mIndex].pos, "#3C091E"]);
-            // Maybe cite another paper
-            if (Math.random() > 0.8) {
-                const pIndex = Math.floor(Math.random() * (GRAPH_SIZE - D_SIZE - M_SIZE)) + D_SIZE + M_SIZE;
-                edges.push([n.pos, nodes[pIndex].pos, "#ffffff"]);
-            }
-        }
-    });
-    return edges;
-};
 
 function NetworkNodes({ nodes }: { nodes: any[] }) {
-    const [hovered, setHovered] = useState<number | null>(null);
+    const [hovered, setHovered] = useState<string | null>(null);
 
     return (
         <group>
@@ -65,6 +22,7 @@ function NetworkNodes({ nodes }: { nodes: any[] }) {
                     onPointerOver={(e) => { e.stopPropagation(); setHovered(n.id); }}
                     onPointerOut={(e) => { e.stopPropagation(); setHovered(null); }}
                 >
+
                     <sphereGeometry args={[n.size, 16, 16]} />
                     <meshBasicMaterial color={hovered === n.id ? "#ffffff" : n.color} wireframe={hovered === n.id} />
 
@@ -105,8 +63,60 @@ function NetworkEdges({ edges }: { edges: any[] }) {
 }
 
 export default function NeuralGraphPage() {
-    const nodes = useMemo(() => generateNodes(), []);
-    const edges = useMemo(() => generateEdges(nodes), [nodes]);
+    const [graphData, setGraphData] = useState<{ nodes: any[], edges: any[] }>({ nodes: [], edges: [] });
+
+    useEffect(() => {
+        const fetchAndBuildGraph = async () => {
+            try {
+                const res = await axios.get("http://localhost:8000/api/v1/papers");
+                const papers = res.data;
+
+                const nodes: any[] = [];
+                const edges: any[] = [];
+                const nodeMap = new Map<string, any>();
+
+                // Helper to add node
+                const addNode = (id: string, type: number, label: string) => {
+                    if (!nodeMap.has(id)) {
+                        const n = {
+                            id,
+                            type,
+                            pos: [(Math.random() - 0.5) * 40, (Math.random() - 0.5) * 40, (Math.random() - 0.5) * 40],
+                            size: type === 0 ? 0.4 : type === 1 ? 0.9 : 0.7,
+                            color: type === 0 ? "#ffffff" : type === 1 ? "#C02B0A" : "#3C091E",
+                            label
+                        };
+                        nodeMap.set(id, n);
+                        nodes.push(n);
+                    }
+                    return nodeMap.get(id);
+                };
+
+                papers.forEach((p: any) => {
+                    const paperNode = addNode(p.id, 0, p.title || p.id);
+
+                    if (p.datasets) {
+                        p.datasets.forEach((d: any) => {
+                            const dsNode = addNode(`ds_${d.name}`, 1, d.name);
+                            edges.push([paperNode.pos, dsNode.pos, "#C02B0A"]);
+                        });
+                    }
+
+                    if (p.methods) {
+                        p.methods.forEach((m: any) => {
+                            const mNode = addNode(`m_${m.name}`, 2, m.name);
+                            edges.push([paperNode.pos, mNode.pos, "#3C091E"]);
+                        });
+                    }
+                });
+
+                setGraphData({ nodes, edges });
+            } catch (err) {
+                console.error("Failed to fetch graph data", err);
+            }
+        };
+        fetchAndBuildGraph();
+    }, []);
 
     return (
         <div className="h-full w-full flex flex-col relative">
@@ -141,8 +151,8 @@ export default function NeuralGraphPage() {
                     <fog attach="fog" args={["#050505", 20, 80]} />
                     <ambientLight intensity={0.5} />
 
-                    <NetworkNodes nodes={nodes} />
-                    <NetworkEdges edges={edges} />
+                    <NetworkNodes nodes={graphData.nodes} />
+                    <NetworkEdges edges={graphData.edges} />
 
                     <OrbitControls
                         enablePan={true}

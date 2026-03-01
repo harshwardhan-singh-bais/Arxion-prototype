@@ -31,11 +31,13 @@ async def init_qdrant():
                 url=settings.QDRANT_URL,
                 api_key=settings.QDRANT_API_KEY,
                 prefer_grpc=False,   # REST is more reliable through cloud firewalls
+                timeout=120,
             )
         else:
             _client = AsyncQdrantClient(
                 url=settings.QDRANT_URL,
                 prefer_grpc=not is_cloud,  # Use gRPC only for local instances
+                timeout=120,
             )
 
         mode = "Cloud (REST)" if is_cloud else "Local"

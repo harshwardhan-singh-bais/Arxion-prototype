@@ -1,37 +1,68 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { ArrowLeft, ExternalLink, ShieldAlert, Cpu, Timer, ShieldCheck, FileKey, AlertOctagon, HelpCircle } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 export default function PaperDetailPage({ params }: { params: { id: string } }) {
     const { id } = params;
+    const [paper, setPaper] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    // Mock data for the credibility breakdown
-    const paper = {
-        title: "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
-        authors: "Rafael Rafailov, Archit Sharma, Eric Mitchell, Christopher D Manning, Stefano Ermon, Chelsea Finn",
-        rci: 88.5,
-        reproducibilityScore: 92,
-        confidenceScore: 85,
-        flags: ["MISSING_HARDWARE_SPECS", "OPEN_SOURCE_WEIGHTS"],
-        effort: {
-            gpuHours: "Est. 320h (A100)",
-            complexity: "Moderate",
-            risk: "Low"
-        },
-        integrity: {
-            multiRun: true,
-            confInterval: true,
-            codeLink: "https://github.com/eric-mitchell/direct-preference-optimization"
-        },
-        evidence: [
-            { type: "CLAIM", text: "DPO eliminates the need for fitting a reward model.", section: "Abstract", conf: 0.99 },
-            { type: "METHOD", text: "Optimizing the policy directly using a simple cross-entropy loss", section: "3. Direct Preference Optimization", conf: 0.95 },
-            { type: "BASELINE", text: "We compare against PPO-based RLHF.", section: "5.1 Baselines", conf: 0.88 },
-            { type: "DATASET", text: "Anthropic HH dataset", section: "5. Experiments", conf: 0.94 }
-        ]
-    };
+    useEffect(() => {
+        const fetchPaper = async () => {
+            try {
+                const res = await axios.get(`http://localhost:8000/api/v1/papers/${id}`);
+                const data = res.data;
+
+                // Map the backend DB structure to the expected UI structure
+                setPaper({
+                    title: data.title || "Untitled Document",
+                    authors: data.authors && data.authors.length > 0 ? data.authors.join(", ") : "Unknown Authors",
+                    rci: Math.floor(Math.random() * 20) + 80, // Needs real calculation
+                    reproducibilityScore: 92, // Mock for now until calculation endpoint
+                    confidenceScore: 85,
+                    flags: data.limitations ? data.limitations.map((l: any) => l.type) : ["OPEN_SOURCE_WEIGHTS"],
+                    effort: {
+                        gpuHours: data.compute ? `${data.compute.hardware} x${data.compute.hours}h` : "Undisclosed",
+                        complexity: "Moderate",
+                        risk: data.status === "FAILED" ? "High" : "Low"
+                    },
+                    integrity: {
+                        multiRun: data.hyperparameters ? data.hyperparameters.seeds_reported : false,
+                        confInterval: true,
+                        codeLink: data.code_link || null
+                    },
+                    evidence: data.claims ? data.claims.map((c: any) => ({
+                        type: "CLAIM",
+                        text: c.statement,
+                        section: c.evidence && c.evidence.length > 0 ? c.evidence[0].section : "Extracted",
+                        conf: 0.95
+                    })) : [
+                        { type: "PROCESSING", text: "Entities are still being extracted...", section: "System", conf: 0.5 }
+                    ]
+                });
+            } catch (err: any) {
+                console.error("Failed to fetch paper:", err);
+                setError(err.message || "Paper not found.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchPaper();
+    }, [id]);
+
+    if (isLoading) {
+        return <div className="p-10 font-mono text-[#97494E] uppercase">ACCESSING SECURE DATA VAULT...</div>;
+    }
+
+    if (error || !paper) {
+        return <div className="p-10 font-mono text-[#C02B0A] uppercase">ERROR: {error || "PAPER CORE CORRUPTED or NOT FOUND."}</div>;
+    }
 
     return (
         <div className="h-full w-full flex flex-col gap-8 max-w-[1400px] mx-auto pb-10">
@@ -126,7 +157,7 @@ export default function PaperDetailPage({ params }: { params: { id: string } }) 
                             <div className="w-2 h-2 bg-[#C02B0A]" /> STRUCTURED EVIDENCE MAPPING
                         </h3>
                         <div className="space-y-4">
-                            {paper.evidence.map((ev, i) => (
+                            {paper.evidence.map((ev: any, i: number) => (
                                 <div key={i} className="p-4 border border-[#3C091E]/20 bg-[#050505] hover:border-[#3C091E]/80 transition-colors flex flex-col md:flex-row gap-4 items-start md:items-center justify-between cursor-pointer">
                                     <div className="flex-1">
                                         <div className="font-mono text-[9px] text-[#97494E] tracking-widest uppercase mb-2 flex items-center gap-2">
@@ -155,11 +186,11 @@ export default function PaperDetailPage({ params }: { params: { id: string } }) 
                             <AlertOctagon size={14} /> Risk Assessment
                         </h3>
                         <div className="flex flex-col gap-2">
-                            {paper.flags.map(f => (
-                                <div key={f} className="text-xs font-mono uppercase bg-[#C02B0A] text-white p-2 text-center tracking-widest">
-                                    {f.replace(/_/g, " ")}
+                            {paper.flags.map((f: string, index: number) => f ? (
+                                <div key={index} className="text-xs font-mono uppercase bg-[#C02B0A] text-white p-2 text-center tracking-widest">
+                                    {String(f).replace(/_/g, " ")}
                                 </div>
-                            ))}
+                            ) : null)}
                         </div>
                     </div>
 
