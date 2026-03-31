@@ -23,7 +23,7 @@ async def get_embeddings(text: str) -> list[float]:
     if not client:
         # Fallback offline
         import random
-        return [random.uniform(-0.1, 0.1) for _ in range(768)]
+        return [random.uniform(-0.1, 0.1) for _ in range(settings.EMBEDDING_DIMENSION)]
     
     response = client.models.embed_content(
         model=EMBED_MODEL,

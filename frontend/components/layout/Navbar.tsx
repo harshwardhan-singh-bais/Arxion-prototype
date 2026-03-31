@@ -8,6 +8,7 @@ import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 export function Navbar() {
     const pathname = usePathname();
     const isLanding = pathname === "/";
+    const isClerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
 
     return (
         <header className="fixed top-0 w-full z-50 bg-white/5 backdrop-blur-md border-b-[0.5px] border-white/10 font-mono tracking-widest text-[11px] uppercase">
@@ -34,33 +35,43 @@ export function Navbar() {
                 )}
 
                 <div className="flex items-center gap-6">
-                    {/* Signed Out: Show LOG IN link */}
-                    <SignedOut>
-                        {isLanding && (
+                    {isClerkConfigured ? (
+                        <>
+                            {/* Signed Out: Show LOG IN link */}
+                            <SignedOut>
+                                {isLanding && (
+                                    <Link href="/sign-in" className="text-muted-foreground hover:text-white transition-colors">
+                                        LOG IN
+                                    </Link>
+                                )}
+                            </SignedOut>
+
+                            {/* Signed In: Show UserButton */}
+                            <SignedIn>
+                                <UserButton
+                                    afterSignOutUrl="/"
+                                    appearance={{
+                                        elements: {
+                                            userButtonTrigger: "rounded-full focus:shadow-none focus:outline-none",
+                                            userButtonBox: "w-8 h-8",
+                                            avatarBox: "!rounded-full w-8 h-8 border border-[#1e293b]/40 hover:brightness-125 transition-all duration-200 cursor-pointer",
+                                            avatarImage: "!rounded-full",
+                                            userButtonPopoverCard: "bg-[#0d111c] border border-[#1e293b]/40 rounded-none",
+                                            userButtonPopoverActionButton: "hover:bg-[#ef4444]/10 rounded-none",
+                                            userButtonPopoverActionButtonText: "text-white font-mono text-xs tracking-widest",
+                                            userButtonPopoverFooter: "hidden",
+                                        },
+                                    }}
+                                />
+                            </SignedIn>
+                        </>
+                    ) : (
+                        isLanding && (
                             <Link href="/sign-in" className="text-muted-foreground hover:text-white transition-colors">
                                 LOG IN
                             </Link>
-                        )}
-                    </SignedOut>
-
-                    {/* Signed In: Show UserButton */}
-                    <SignedIn>
-                        <UserButton
-                            afterSignOutUrl="/"
-                            appearance={{
-                                elements: {
-                                    userButtonTrigger: "rounded-full focus:shadow-none focus:outline-none",
-                                    userButtonBox: "w-8 h-8",
-                                    avatarBox: "!rounded-full w-8 h-8 border border-[#1e293b]/40 hover:brightness-125 transition-all duration-200 cursor-pointer",
-                                    avatarImage: "!rounded-full",
-                                    userButtonPopoverCard: "bg-[#0d111c] border border-[#1e293b]/40 rounded-none",
-                                    userButtonPopoverActionButton: "hover:bg-[#ef4444]/10 rounded-none",
-                                    userButtonPopoverActionButtonText: "text-white font-mono text-xs tracking-widest",
-                                    userButtonPopoverFooter: "hidden",
-                                },
-                            }}
-                        />
-                    </SignedIn>
+                        )
+                    )}
 
                     <Button
                         asChild

@@ -8,6 +8,7 @@ import {
     Upload,
     Database,
     Network,
+    Layers,
     Crosshair,
     MessageSquare,
     FileSignature,
@@ -16,6 +17,8 @@ import {
     PanelLeft,
     FileStack,
     User,
+    FolderKanban,
+    Radio,
 } from "lucide-react";
 import { UserButton, SignOutButton } from "@clerk/nextjs";
 
@@ -23,15 +26,19 @@ const links = [
     { name: "FIELD HEALTH", href: "/dashboard", icon: Activity },
     { name: "INGESTION", href: "/dashboard/upload", icon: Upload },
     { name: "PAPERS", href: "/dashboard/papers", icon: FileStack },
+    { name: "LAYER 2 SUITE", href: "/dashboard/layer2", icon: Layers },
     { name: "LIT MATRIX", href: "/dashboard/matrix", icon: Database },
     { name: "3D NEURAL GRAPH", href: "/dashboard/graph", icon: Network },
     { name: "GAP INTELLIGENCE", href: "/dashboard/gaps", icon: Crosshair },
     { name: "MATRIX CHAT", href: "/dashboard/chat", icon: MessageSquare },
     { name: "DRAFTS & EXPORT", href: "/dashboard/export", icon: FileSignature },
+    { name: "WORKSPACE", href: "/dashboard/workspace", icon: FolderKanban },
+    { name: "LIVE FEED", href: "/dashboard/live", icon: Radio },
     { name: "PROFILE", href: "/dashboard/profile", icon: User },
 ];
 
 export function Sidebar() {
+    const isClerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
     const [expanded, setExpanded] = useState(true);
     const [mobileOpen, setMobileOpen] = useState(false);
     const sidebarRef = useRef<HTMLElement>(null);
@@ -141,26 +148,32 @@ export function Sidebar() {
             <div className="px-3 py-3 border-t border-[#1e293b]/30 bg-black/30 space-y-3">
                 {/* User + Status */}
                 <div className={`flex items-center ${expanded ? "gap-3" : "justify-center"}`}>
-                    <UserButton
-                        afterSignOutUrl="/"
-                        appearance={{
-                            elements: {
-                                userButtonTrigger: "rounded-full focus:shadow-none focus:outline-none",
-                                userButtonBox: "w-10 h-10",
-                                avatarBox: "!rounded-full w-10 h-10 border border-[#1e293b]/40 hover:brightness-125 transition-all duration-200 cursor-pointer",
-                                avatarImage: "!rounded-full",
-                                userButtonPopoverCard: "bg-[#0d111c] border border-[#1e293b]/40 rounded-none",
-                                userButtonPopoverActionButton: "hover:bg-[#ef4444]/10 rounded-none",
-                                userButtonPopoverActionButtonText: "text-white font-mono text-xs tracking-widest",
-                                userButtonPopoverFooter: "hidden",
-                            },
-                        }}
-                    />
+                    {isClerkConfigured ? (
+                        <UserButton
+                            afterSignOutUrl="/"
+                            appearance={{
+                                elements: {
+                                    userButtonTrigger: "rounded-full focus:shadow-none focus:outline-none",
+                                    userButtonBox: "w-10 h-10",
+                                    avatarBox: "!rounded-full w-10 h-10 border border-[#1e293b]/40 hover:brightness-125 transition-all duration-200 cursor-pointer",
+                                    avatarImage: "!rounded-full",
+                                    userButtonPopoverCard: "bg-[#0d111c] border border-[#1e293b]/40 rounded-none",
+                                    userButtonPopoverActionButton: "hover:bg-[#ef4444]/10 rounded-none",
+                                    userButtonPopoverActionButtonText: "text-white font-mono text-xs tracking-widest",
+                                    userButtonPopoverFooter: "hidden",
+                                },
+                            }}
+                        />
+                    ) : (
+                        <div className="w-10 h-10 rounded-full border border-[#1e293b]/40 flex items-center justify-center text-[#94a3b8]">
+                            <User size={14} />
+                        </div>
+                    )}
                     {expanded && (
                         <div className="flex items-center gap-2 min-w-0">
                             <div className="w-1.5 h-1.5 bg-[#ef4444] animate-pulse rounded-full flex-shrink-0" />
                             <span className="font-mono text-[8px] text-[#94a3b8] tracking-[0.2em] uppercase truncate">
-                                Engine Stable
+                                {isClerkConfigured ? "Engine Stable" : "Auth Off"}
                             </span>
                         </div>
                     )}
@@ -176,17 +189,30 @@ export function Sidebar() {
                 )}
 
                 {/* Disconnect */}
-                <SignOutButton>
-                    <button
+                {isClerkConfigured ? (
+                    <SignOutButton>
+                        <button
+                            className={`flex items-center gap-2.5 text-[#94a3b8] hover:text-[#ef4444] transition-colors font-mono text-[9px] tracking-[0.2em] uppercase w-full ${
+                                !expanded ? "justify-center" : ""
+                            }`}
+                            title={!expanded ? "DISCONNECT" : undefined}
+                        >
+                            <LogOut size={13} />
+                            {expanded && <span>DISCONNECT</span>}
+                        </button>
+                    </SignOutButton>
+                ) : (
+                    <Link
+                        href="/sign-in"
                         className={`flex items-center gap-2.5 text-[#94a3b8] hover:text-[#ef4444] transition-colors font-mono text-[9px] tracking-[0.2em] uppercase w-full ${
                             !expanded ? "justify-center" : ""
                         }`}
-                        title={!expanded ? "DISCONNECT" : undefined}
+                        title={!expanded ? "SIGN IN" : undefined}
                     >
                         <LogOut size={13} />
-                        {expanded && <span>DISCONNECT</span>}
-                    </button>
-                </SignOutButton>
+                        {expanded && <span>SIGN IN</span>}
+                    </Link>
+                )}
             </div>
         </div>
     );

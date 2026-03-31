@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 import { UserButton } from "@clerk/nextjs";
-import { ChevronRight, FileText, CheckCircle2, Crosshair, Pencil, Save } from "lucide-react";
+import { ChevronRight, User, Pencil, Save } from "lucide-react";
 
 function MetricCard({ title, value, sub }: { title: string; value: string | number; sub: string }) {
     return (
@@ -21,7 +21,7 @@ function MetricCard({ title, value, sub }: { title: string; value: string | numb
     );
 }
 
-export default function ProfilePage() {
+function ClerkProfilePage() {
     const { user, isLoaded } = useUser();
     const [displayName, setDisplayName] = useState("");
     const [isEditing, setIsEditing] = useState(false);
@@ -196,4 +196,142 @@ export default function ProfilePage() {
             </div>
         </div>
     );
+}
+
+function LocalProfilePage() {
+    const [displayName, setDisplayName] = useState("Local User");
+    const [isEditing, setIsEditing] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [stats, setStats] = useState({ papers: 0, processed: 0, gaps: 0 });
+
+    useEffect(() => {
+        fetchStats();
+    }, []);
+
+    async function fetchStats() {
+        try {
+            const res = await fetch("/api/v1/profile", { credentials: "include" });
+            if (res.ok) {
+                const data = await res.json();
+                setStats({
+                    papers: data.papers_count || 0,
+                    processed: data.processed_count || 0,
+                    gaps: data.gaps_count || 0,
+                });
+                if (data.display_name) setDisplayName(data.display_name);
+            }
+        } catch (e) {
+            console.error("Failed to fetch profile stats:", e);
+        }
+    }
+
+    async function handleSave() {
+        setSaving(true);
+        try {
+            await fetch("/api/v1/profile", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ display_name: displayName }),
+            });
+            setIsEditing(false);
+        } catch (e) {
+            console.error("Failed to save profile:", e);
+        } finally {
+            setSaving(false);
+        }
+    }
+
+    return (
+        <div className="h-full w-full flex flex-col gap-8">
+            <div className="flex justify-between items-end border-b border-[#1e293b]/30 pb-6">
+                <div>
+                    <div className="font-mono text-[10px] text-[#ef4444] tracking-[0.3em] uppercase mb-2 flex items-center gap-3">
+                        <div className="w-4 h-0.5 bg-[#ef4444]" />
+                        User Intelligence
+                    </div>
+                    <h1 className="text-4xl lg:text-5xl font-display font-black text-white tracking-tighter uppercase">
+                        Profile
+                    </h1>
+                </div>
+            </div>
+
+            <div className="p-8 bg-white/5 border border-[#1e293b]/30">
+                <div className="flex items-center gap-6">
+                    <div className="w-16 h-16 rounded-full border-2 border-[#1e293b]/40 flex items-center justify-center text-[#94a3b8]">
+                        <User size={22} />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                        {isEditing ? (
+                            <div className="flex items-center gap-3">
+                                <input
+                                    type="text"
+                                    value={displayName}
+                                    onChange={(e) => setDisplayName(e.target.value)}
+                                    className="bg-white/[0.06] border border-[#1e293b]/50 px-4 py-2 font-mono text-sm text-white tracking-wider focus:outline-none focus:border-[#ef4444]/50 w-full max-w-xs"
+                                    placeholder="Enter display name"
+                                />
+                                <button
+                                    onClick={handleSave}
+                                    disabled={saving}
+                                    className="flex items-center gap-2 px-4 py-2 bg-[#ef4444] text-white font-mono text-[10px] tracking-[0.2em] uppercase hover:bg-[#ef4444]/80 transition-colors disabled:opacity-50"
+                                >
+                                    <Save size={12} />
+                                    {saving ? "SAVING..." : "SAVE"}
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center gap-3">
+                                <h2 className="text-2xl font-display font-black text-white tracking-tighter truncate">
+                                    {displayName || "Local User"}
+                                </h2>
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="text-[#94a3b8] hover:text-[#ef4444] transition-colors"
+                                >
+                                    <Pencil size={14} />
+                                </button>
+                            </div>
+                        )}
+                        <div className="font-mono text-[9px] text-[#94a3b8] tracking-[0.2em] uppercase mt-1">
+                            Clerk not configured
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <MetricCard title="Papers Uploaded" value={stats.papers} sub="Total ingested" />
+                <MetricCard title="Papers Processed" value={stats.processed} sub="Analysis complete" />
+                <MetricCard title="Gaps Created" value={stats.gaps} sub="Research gaps" />
+            </div>
+
+            <div className="p-6 bg-white/5 border border-[#1e293b]/30">
+                <h3 className="font-mono text-[10px] text-[#ef4444] tracking-[0.3em] uppercase mb-4 flex items-center gap-3">
+                    <div className="w-3 h-0.5 bg-[#ef4444]" />
+                    Account Details
+                </h3>
+                <div className="space-y-3">
+                    <div className="flex justify-between items-center py-2 border-b border-[#1e293b]/20">
+                        <span className="font-mono text-[10px] text-[#94a3b8] tracking-[0.2em] uppercase">Email</span>
+                        <span className="font-mono text-xs text-white">—</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2 border-b border-[#1e293b]/20">
+                        <span className="font-mono text-[10px] text-[#94a3b8] tracking-[0.2em] uppercase">Joined</span>
+                        <span className="font-mono text-xs text-white">—</span>
+                    </div>
+                    <div className="flex justify-between items-center py-2">
+                        <span className="font-mono text-[10px] text-[#94a3b8] tracking-[0.2em] uppercase">Auth Provider</span>
+                        <span className="font-mono text-xs text-[#ef4444]">DISABLED</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+export default function ProfilePage() {
+    const isClerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+    return isClerkConfigured ? <ClerkProfilePage /> : <LocalProfilePage />;
 }

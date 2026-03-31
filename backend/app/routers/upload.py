@@ -11,6 +11,7 @@ from typing import List
 from fastapi import APIRouter, UploadFile, File, HTTPException, BackgroundTasks, Form
 
 from app.core.config import settings
+from app.core.feature_logging import log_feature_start, log_feature_success, log_feature_failure
 from app.models.paper import PaperInDB, PaperStatus, UploadResponse
 from app.models.store import save_paper
 from app.services.ingestion import run_ingestion_pipeline
@@ -32,15 +33,18 @@ async def upload_pdf(
     Accept a PDF upload, save it to disk, register the paper as INGESTED,
     and kick off the background ingestion pipeline.
     """
+    log_feature_start(logger, "INGESTION", "upload_pdf", "Upload request received", filename=file.filename)
     print(f"\n[{'*'*15} INGESTION TRIGGERED {'*'*15}]")
     print(f"📥 Received file: {file.filename}")
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         print(f"❌ FAILURE: Only .pdf files are accepted.")
+        log_feature_failure(logger, "INGESTION", "upload_pdf", "Rejected non-PDF upload", filename=file.filename)
         raise HTTPException(status_code=400, detail="Only .pdf files are accepted.")
 
     content = await file.read()
     if len(content) > MAX_BYTES:
         print(f"❌ FAILURE: File exceeds size limit ({len(content)} bytes)")
+        log_feature_failure(logger, "INGESTION", "upload_pdf", "Upload exceeded max size", filename=file.filename, size_bytes=len(content), max_bytes=MAX_BYTES)
         raise HTTPException(
             status_code=413,
             detail=f"File exceeds maximum size of {settings.MAX_UPLOAD_SIZE_MB} MB.",
@@ -61,11 +65,13 @@ async def upload_pdf(
         file_path=str(file_path),
         status=PaperStatus.INGESTED,
     )
-    save_paper(paper)
+    await save_paper(paper)
     print(f"✅ Registered paper inside Memory Store: {paper_id}")
 
     print(f"⏳ Handing off to Background Async Pipeline...")
     background_tasks.add_task(run_ingestion_pipeline, paper)
+
+    log_feature_success(logger, "INGESTION", "upload_pdf", "Upload accepted and background pipeline queued", paper_id=paper_id, filename=file.filename)
 
     return UploadResponse(
         paper_id=paper_id,
@@ -84,13 +90,16 @@ async def upload_multiple_pdfs(
     Accept multiple PDFs, save each to disk, register them as INGESTED,
     and kick off independent background pipelines.
     """
+    log_feature_start(logger, "INGESTION", "upload_pdfs", "Batch upload request received", file_count=len(files))
     if not files:
+        log_feature_failure(logger, "INGESTION", "upload_pdfs", "No files were provided")
         raise HTTPException(status_code=400, detail="No files provided.")
 
     responses: List[UploadResponse] = []
 
     for file in files:
         if not file.filename or not file.filename.lower().endswith(".pdf"):
+            log_feature_failure(logger, "INGESTION", "upload_pdfs_item", "Skipped non-PDF file", filename=file.filename)
             responses.append(UploadResponse(
                 paper_id="",
                 filename=file.filename or "unknown",
@@ -101,6 +110,7 @@ async def upload_multiple_pdfs(
 
         content = await file.read()
         if len(content) > MAX_BYTES:
+            log_feature_failure(logger, "INGESTION", "upload_pdfs_item", "Skipped oversized file", filename=file.filename, size_bytes=len(content), max_bytes=MAX_BYTES)
             responses.append(UploadResponse(
                 paper_id="",
                 filename=file.filename,
@@ -123,9 +133,10 @@ async def upload_multiple_pdfs(
             file_path=str(file_path),
             status=PaperStatus.INGESTED,
         )
-        save_paper(paper)
+        await save_paper(paper)
 
         background_tasks.add_task(run_ingestion_pipeline, paper)
+        log_feature_success(logger, "INGESTION", "upload_pdfs_item", "File queued for ingestion", paper_id=paper_id, filename=file.filename)
 
         responses.append(UploadResponse(
             paper_id=paper_id,
@@ -134,6 +145,9 @@ async def upload_multiple_pdfs(
             message=f"Paper received. Processing started.",
         ))
 
+    success_count = sum(1 for r in responses if r.status == PaperStatus.INGESTED)
+    failure_count = len(responses) - success_count
+    log_feature_success(logger, "INGESTION", "upload_pdfs", "Batch upload processed", total=len(responses), success=success_count, failure=failure_count)
     return responses
 
 
@@ -147,7 +161,9 @@ async def upload_text(
     Accept raw text (copy-paste or JSON body), register as INGESTED,
     and kick off the background pipeline.
     """
+    log_feature_start(logger, "INGESTION", "upload_text", "Raw text ingestion request received", title=title, text_length=len(text or ""))
     if len(text.strip()) < 100:
+        log_feature_failure(logger, "INGESTION", "upload_text", "Submitted text too short", title=title, text_length=len(text or ""))
         raise HTTPException(status_code=400, detail="Submitted text is too short.")
 
     paper_id = str(uuid.uuid4())
@@ -162,25 +178,19 @@ async def upload_text(
         file_path=str(file_path),
         status=PaperStatus.INGESTED,
     )
-    save_paper(paper)
+    await save_paper(paper)
 
     async def _text_pipeline(p: PaperInDB):
-        from app.models.paper import PaperStatus
-        from app.models.store import update_paper
         from app.services.ingestion import run_ingestion_pipeline
-        from app.services.extractor import extract_text_from_pdf
 
-        import app.services.ingestion as ing
-        original_fn = ing.extract_text_from_pdf
-
-        def read_text_file(path):
+        def read_text_file(path: str) -> str:
             return Path(path).read_text(encoding="utf-8")
 
-        ing.extract_text_from_pdf = read_text_file
-        await run_ingestion_pipeline(p)
-        ing.extract_text_from_pdf = original_fn
+        await run_ingestion_pipeline(p, text_extractor=read_text_file)
 
     background_tasks.add_task(_text_pipeline, paper)
+
+    log_feature_success(logger, "INGESTION", "upload_text", "Raw text queued for ingestion", paper_id=paper_id, filename=filename)
 
     return UploadResponse(
         paper_id=paper_id,

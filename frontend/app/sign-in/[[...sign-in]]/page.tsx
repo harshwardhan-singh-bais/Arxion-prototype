@@ -1,7 +1,27 @@
+"use client";
+
 import { SignIn } from "@clerk/nextjs";
 import Link from "next/link";
 
 export default function SignInPage() {
+  const isClerkConfigured = Boolean(process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY);
+
+  if (!isClerkConfigured) {
+    return (
+      <div className="min-h-screen bg-[#0b0f19] flex items-center justify-center px-6">
+        <div className="max-w-xl w-full border border-[#1e293b]/40 bg-[#0d111c] p-8 text-center">
+          <h1 className="text-2xl font-display font-black text-white mb-4 uppercase">Auth Disabled</h1>
+          <p className="font-mono text-xs text-[#94a3b8] leading-relaxed uppercase tracking-wide">
+            Set NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY and CLERK_SECRET_KEY to enable Clerk authentication.
+          </p>
+          <Link href="/" className="inline-block mt-6 text-[#ef4444] font-mono text-xs uppercase tracking-widest">
+            Back To Home
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#0b0f19] flex flex-col items-center justify-center relative overflow-hidden">
 

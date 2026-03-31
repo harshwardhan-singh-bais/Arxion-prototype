@@ -43,17 +43,31 @@ function MetricCard({ title, value, sub, warning = false }: any) {
 export default function FieldHealthDashboard() {
     const [stats, setStats] = useState({
         totalPapers: 0,
-        rciDisplay: "82.4%", // default mock if no data
+        rciDisplay: "--",
+        codeAvailability: "--",
+        reproducibility: "--",
+        saturation: "--",
+        totalFeatures: 0,
     });
 
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const res = await axios.get("http://localhost:8000/api/v1/papers");
-                const papers = res.data;
+                const [papersRes, healthRes, featuresRes] = await Promise.all([
+                    axios.get("http://localhost:8000/api/v1/papers"),
+                    axios.get("http://localhost:8000/api/v1/layer2/field-health"),
+                    axios.get("http://localhost:8000/api/v1/features"),
+                ]);
+                const papers = papersRes.data;
+                const health = healthRes.data;
+                const features = featuresRes.data;
                 setStats({
                     totalPapers: papers.length,
-                    rciDisplay: papers.length > 0 ? "87.1%" : "--", // Simulated RCI avg
+                    rciDisplay: papers.length > 0 ? `${health.overall_health_score}%` : "--",
+                    codeAvailability: `${health.code_availability_rate}%`,
+                    reproducibility: `${health.reproducibility_rate}%`,
+                    saturation: `${health.benchmark_saturation_score}%`,
+                    totalFeatures: features.length,
                 });
             } catch (e) {
                 console.error(e);
@@ -84,8 +98,8 @@ export default function FieldHealthDashboard() {
             {/* Main KPI Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <MetricCard title="Arxion Credibility (RCI)" value={stats.rciDisplay} sub="Global Field Average" />
-                <MetricCard title="Public Code Avail." value="34.1%" sub="12% decline vs 2025" warning />
-                <MetricCard title="Hyperparam Veil" value="68.9%" sub="Training params missing" warning />
+                <MetricCard title="Public Code Avail." value={stats.codeAvailability} sub="Papers with public code" />
+                <MetricCard title="Reproducibility" value={stats.reproducibility} sub="Papers with disclosed hyperparams" />
                 <MetricCard title="Total Ingested" value={stats.totalPapers.toString()} sub="Papers verified" />
             </div>
 

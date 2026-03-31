@@ -7,6 +7,7 @@ import json
 import logging
 import asyncio
 from functools import partial
+from app.core.feature_logging import log_feature_start, log_feature_success, log_feature_failure
 from app.core.gemini import get_generation_model
 
 logger = logging.getLogger(__name__)
@@ -70,6 +71,7 @@ async def extract_entities(paper_text: str, max_chars: int = 40000) -> dict:
     """
     truncated_text = paper_text[:max_chars]
     prompt = f"{_SYSTEM_PROMPT}\n\nPAPER TEXT:\n{truncated_text}"
+    log_feature_start(logger, "EXTRACTION", "entity_extract", "Gemini entity extraction started", input_chars=len(paper_text), truncated_chars=len(truncated_text))
 
     model = get_generation_model()
 
@@ -80,7 +82,17 @@ async def extract_entities(paper_text: str, max_chars: int = 40000) -> dict:
         partial(_call_gemini, model, prompt),
     )
 
-    return _parse_response(response)
+    parsed = _parse_response(response)
+    log_feature_success(
+      logger,
+      "EXTRACTION",
+      "entity_extract",
+      "Gemini entity extraction finished",
+      claims=len(parsed.get("claims", [])) if isinstance(parsed, dict) else 0,
+      datasets=len(parsed.get("datasets", [])) if isinstance(parsed, dict) else 0,
+      methods=len(parsed.get("methods", [])) if isinstance(parsed, dict) else 0,
+    )
+    return parsed
 
 
 def _call_gemini(model, prompt: str) -> str:
@@ -90,6 +102,7 @@ def _call_gemini(model, prompt: str) -> str:
         return response.text
     except Exception as e:
         logger.warning(f"Google API LLM crashed: {e}. Falling back to dynamic mock!")
+        log_feature_failure(logger, "EXTRACTION", "gemini_call", "Gemini generate_content failed; returning fallback payload", error=e)
         return '{"title": "MOCKED DUE TO API ERROR", "authors": ["Arxion Admin"], "claims": [{"statement": "This paper was mocked because the provided Gemini API key disabled generateContent limits.", "evidence":[]}], "datasets": [{"name":"MockDB Dataset"}], "methods": [{"name": "Arxion Vector Mock Engine"}], "limitations": [{"description": "API connection failure."}]}'
 
 
@@ -105,6 +118,7 @@ def _parse_response(raw: str) -> dict:
         return json.loads(text)
     except json.JSONDecodeError as e:
         logger.error(f"Failed to parse Gemini JSON response: {e}\nRaw response:\n{text[:500]}")
+        log_feature_failure(logger, "EXTRACTION", "parse_json", "Failed to parse Gemini JSON response", error=e)
         # Return a safe minimal fallback
         return {
             "title": "Unknown",

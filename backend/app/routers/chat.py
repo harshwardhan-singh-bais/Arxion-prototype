@@ -2,12 +2,15 @@
 Chat Router — RAG query interface over ingested paper chunks.
 POST /api/v1/chat
 """
+import logging
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from app.core.feature_logging import log_feature_start, log_feature_success, log_feature_failure
 from app.services.vector_store import search_chunks
 from app.core.gemini import get_generation_model
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 class ChatRequest(BaseModel):
     query: str
@@ -25,11 +28,13 @@ class ChatResponse(BaseModel):
 
 @router.post("/chat", response_model=ChatResponse, summary="Chat with papers using RAG")
 async def chat_with_papers(req: ChatRequest):
+    log_feature_start(logger, "RAG", "chat", "Chat query received", query_length=len(req.query or ""), scoped=bool(req.paper_ids), paper_scope_count=len(req.paper_ids or []))
     print(f"\n[{'*'*15} RAG CHAT TRIGGERED {'*'*15}]")
     print(f"💬 Query: '{req.query}'")
     
     if not req.query.strip():
         print(f"❌ FAILURE: Empty query received.")
+        log_feature_failure(logger, "RAG", "chat", "Empty query rejected")
         raise HTTPException(status_code=400, detail="Query cannot be empty.")
 
     # 1. Retrieve context chunks from Qdrant
@@ -38,11 +43,13 @@ async def chat_with_papers(req: ChatRequest):
     
     if not results:
         print(f"⚠️ WARNING: No semantic matches found in Database.")
+        log_feature_failure(logger, "RAG", "chat_retrieval", "No semantic matches found", scoped=bool(req.paper_ids), paper_scope_count=len(req.paper_ids or []))
         return ChatResponse(
             answer="I couldn't find any relevant information in the selected papers to answer your question.",
             citations=[]
         )
     print(f"✅ Found {len(results)} relevant chunks in Qdrant.")
+    log_feature_success(logger, "RAG", "chat_retrieval", "Semantic retrieval returned context", result_count=len(results))
 
     # 2. Construct context string and citation mapped list
     print(f"🧬 Constructing Grounded Context for LLM...")
@@ -77,9 +84,12 @@ USER QUERY:
         response = model.generate_content(prompt)
         answer = response.text
         print(f"✅ Gemini Response Received: {len(answer)} characters.")
+        log_feature_success(logger, "RAG", "chat_generation", "Generated grounded response", answer_length=len(answer), citation_count=len(citations))
     except Exception as e:
         print(f"❌ WARNING: Gemini LLM crashed -> {str(e)} (Mocking Response)")
+        log_feature_failure(logger, "RAG", "chat_generation", "Generation failed; returning mocked response", error=e)
         answer = f"[MOCKED RAG RESPONSE] Because the Gemini API Key offline/invalid, I am operating offline. However, I found {len(results)} chunks of context in Qdrant matching your query!"
 
     print(f"[{'*'*15} CHAT CYCLE COMPLETE {'*'*15}]\n")
+    log_feature_success(logger, "RAG", "chat", "Chat request completed", citation_count=len(citations))
     return ChatResponse(answer=answer, citations=citations)
