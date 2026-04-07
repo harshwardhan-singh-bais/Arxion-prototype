@@ -18,7 +18,7 @@ Instead of manually reading every PDF, users can:
 2. Let the pipeline extract metadata, claims, methods, datasets, and limitations
 3. Ask questions over the ingested corpus
 4. Track research gaps and contradictions
-5. Export synthesis artifacts (CSV matrix, BibTeX, related-work draft)
+5. Export synthesis artifacts (CSV matrix, related-work draft)
 
 ## 2) High-Level Architecture
 
