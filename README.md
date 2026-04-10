@@ -9,7 +9,7 @@ This README explains:
 4. What input is given at each stage and what output is returned
 5. How to run the project
 
-## 1) Project 
+## 1) Project
 
 Arxion helps teams move from raw papers to usable research intelligence.
 
